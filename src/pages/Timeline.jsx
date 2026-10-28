@@ -5,6 +5,7 @@ import { go } from '../router.js';
 import { playBgm, stopBgm } from '../services/bgm.js';
 
 const SLIDE_MS = 6500; // 사진 한 장이 머무는 시간
+const CHAPTER_MS = 10000; // 장면의 첫 사진(설명 글이 함께 나오는 사진)이 머무는 시간
 const TITLE_MS = 7000; // 사진 없는 장면(제목 카드)이 머무는 시간
 
 // 연표를 슬라이드 목록으로 펼칩니다. 장면마다 사진 수만큼 슬라이드가 생기고,
@@ -21,6 +22,8 @@ function buildSlides() {
   });
   return slides;
 }
+
+const slideMs = (sl) => (!sl.photo ? TITLE_MS : sl.first ? CHAPTER_MS : SLIDE_MS);
 
 export default function Timeline() {
   const slides = useMemo(buildSlides, []);
@@ -48,9 +51,9 @@ export default function Timeline() {
   useEffect(() => {
     clearTimeout(timer.current);
     if (!started || !playing || ended) return;
-    timer.current = setTimeout(next, s.photo ? SLIDE_MS : TITLE_MS);
+    timer.current = setTimeout(next, slideMs(s));
     return () => clearTimeout(timer.current);
-  }, [started, playing, ended, idx, next, s.photo]);
+  }, [started, playing, ended, idx, next, s]);
 
   // 다음 사진 미리 불러오기
   useEffect(() => {
@@ -110,7 +113,12 @@ export default function Timeline() {
 
       {/* 글자 */}
       {started && (
-        <div className="show-text" key={idx}>
+        // 사진이 잘 보이도록 글은 잠시 보였다가 사라집니다. 일시정지하면 계속 보여요.
+        <div
+          className={s.photo && playing ? 'show-text fades' : 'show-text'}
+          style={{ '--slide-ms': `${slideMs(s)}ms` }}
+          key={idx}
+        >
           <p className="show-when">{s.t.when}</p>
           <h2>{s.t.title}</h2>
           {s.first && <p className="show-body">{s.t.text}</p>}
