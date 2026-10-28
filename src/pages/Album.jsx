@@ -132,7 +132,7 @@ function UploadForm({ onCancel, onDone }) {
         <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="예) 가족들과 함께한 봄날" />
       </label>
       <label>촬영 시기 (선택)
-        <input value={era} onChange={(e) => setEra(e.target.value)} placeholder="예) 1980년대, 결혼하고 얼마 뒤" />
+        <input value={era} onChange={(e) => setEra(e.target.value)} placeholder="예) 결혼하고 얼마 뒤" />
       </label>
       <label>사진에 담긴 이야기 (선택)
         <textarea rows={4} value={story} onChange={(e) => setStory(e.target.value)} placeholder="그날의 이야기를 적어 보세요" />

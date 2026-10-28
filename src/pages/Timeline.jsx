@@ -5,9 +5,11 @@ import { go } from '../router.js';
 import { prepareBgm, playBgm, stopBgm, resumeBgm } from '../services/bgm.js';
 import { Player } from './Video.jsx';
 
-const SLIDE_MS = 6500; // 사진 한 장이 머무는 시간
-const CHAPTER_MS = 10000; // 장면의 첫 사진(설명 글이 함께 나오는 사진)이 머무는 시간
-const TITLE_MS = 7000; // 사진 없는 장면(글자 화면)이 머무는 시간
+// 전체 길이가 약 1분이 되도록 맞춘 시간(밀리초)
+const OPENING_MS = 2800; // 여는 화면
+const TITLE_MS = 2400; // 사진 없는 장면(글자 화면)
+const FIRST_MS = 3400; // 장면의 첫 사진(장면 제목이 함께 나옴)
+const PHOTO_MS = 2700; // 그다음 사진
 
 // 연표를 슬라이드 목록으로 펼칩니다. 맨 앞에 여는 화면을 두고,
 // 장면마다 사진 수만큼 슬라이드를 만들며, 사진이 없는 장면은 글자 화면이 됩니다.
@@ -24,7 +26,7 @@ function buildSlides() {
   return slides;
 }
 
-const slideMs = (sl) => (!sl.photo ? TITLE_MS : sl.first ? CHAPTER_MS : SLIDE_MS);
+const slideMs = (sl) => (sl.opening ? OPENING_MS : !sl.photo ? TITLE_MS : sl.first ? FIRST_MS : PHOTO_MS);
 
 // 접속하면 바로 시작하는 인생 연표 슬라이드쇼. 마지막은 생신 축하 영상으로 이어집니다.
 export default function Timeline() {
@@ -191,7 +193,6 @@ export default function Timeline() {
         >
           <p className="show-when">{s.t.when}</p>
           <h2>{s.t.title}</h2>
-          {s.first && <p className="show-body">{s.t.text}</p>}
           {s.photo && !s.first && <p className="show-cap">{s.photo.caption}</p>}
         </div>
       )}
