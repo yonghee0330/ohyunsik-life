@@ -124,14 +124,42 @@ export const PLACES = [
   { id: 'port87', name: '1987년 부두', lat: null, lng: null, note: '네 식구가 함께 선 날', photos: ['p19'] },
 ];
 
-// 편지 쓰기를 도와주는 시작 문장 (누르면 본문에 들어갑니다)
-export const LETTER_STARTERS = [
-  { label: '가장 고마웠던 순간', text: '아버님께 가장 고마웠던 순간은 ' },
-  { label: '기억나는 장면', text: '제 기억 속 아버님은 ' },
-  { label: '배운 것', text: '아버님께 배운 가장 큰 것은 ' },
-  { label: '밥상의 기억', text: '아버님이 차려 주신 음식 중 가장 기억에 남는 것은 ' },
-  { label: '앞으로 바라는 것', text: '앞으로 아버님과 함께 꼭 하고 싶은 일은 ' },
+// 편지지. 쓰는 사람이 고르고, 읽을 때도 이 배경 위에 글이 흐릅니다. (배경은 모두 CSS라 사진 파일이 필요 없어요)
+export const LETTER_PAPERS = [
+  { id: 'cream', name: '크림', bg: '#fbf6ea', ink: '#3a3027', sub: '#8a7b68' },
+  {
+    id: 'dawn', name: '새벽빛',
+    bg: 'linear-gradient(160deg, #e6edfb 0%, #f1e8f6 55%, #fbeaf0 100%)',
+    ink: '#33324a', sub: '#7a7894',
+  },
+  {
+    id: 'blossom', name: '벚꽃',
+    bg: 'radial-gradient(circle at 14% 22%, #fff 0 2px, transparent 3px), radial-gradient(circle at 82% 30%, #fff 0 2.5px, transparent 3.5px), radial-gradient(circle at 38% 78%, #fff 0 2px, transparent 3px), radial-gradient(circle at 70% 88%, #fff 0 2.5px, transparent 3.5px), linear-gradient(160deg, #fdf0f3, #f8dde5)',
+    ink: '#4a2f38', sub: '#9a7480',
+  },
+  {
+    id: 'forest', name: '숲 안개',
+    bg: 'linear-gradient(165deg, #eef4ea 0%, #d6e6d4 100%)',
+    ink: '#2f3f33', sub: '#6f8574',
+  },
+  {
+    id: 'sunset', name: '노을',
+    bg: 'linear-gradient(170deg, #fde9d6 0%, #f6d4d6 55%, #dcd3ee 100%)',
+    ink: '#48332f', sub: '#9a7c78',
+  },
+  {
+    id: 'sea', name: '바다',
+    bg: 'linear-gradient(170deg, #e4f3f6 0%, #c9e5ec 55%, #b3d3e4 100%)',
+    ink: '#24404d', sub: '#648594',
+  },
+  {
+    id: 'night', name: '밤하늘', dark: true,
+    bg: 'radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent), radial-gradient(1px 1px at 28% 62%, #fff 50%, transparent), radial-gradient(1.5px 1.5px at 46% 30%, #fff 50%, transparent), radial-gradient(1px 1px at 63% 74%, #fff 50%, transparent), radial-gradient(1.5px 1.5px at 78% 22%, #fff 50%, transparent), radial-gradient(1px 1px at 90% 58%, #fff 50%, transparent), radial-gradient(1px 1px at 8% 84%, #fff 50%, transparent), linear-gradient(170deg, #1b2240 0%, #2b3558 100%)',
+    ink: '#f3eee1', sub: '#b9bfd8',
+  },
 ];
+
+export const paperOf = (id) => LETTER_PAPERS.find((p) => p.id === id) || LETTER_PAPERS[0];
 
 // 감사 100가지 쓰기 예시
 export const GRATITUDE_STARTERS = [

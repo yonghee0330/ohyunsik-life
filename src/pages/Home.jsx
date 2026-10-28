@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { SITE, VIDEO, GRATITUDE_GOAL } from '../config.js';
-import { TIMELINE, LETTER_STYLES, photoById } from '../data/content.js';
+import { TIMELINE, LETTER_STYLES, photoById, paperOf } from '../data/content.js';
 import { listLetters, listGratitude, listVoices } from '../services/store.js';
 import { go } from '../router.js';
 import { formatDate } from '../components/Common.jsx';
@@ -125,8 +125,9 @@ export default function Home() {
             <div className="notes">
               {letters.slice(0, 3).map((l, i) => {
                 const s = LETTER_STYLES[i % LETTER_STYLES.length];
+                const p = paperOf(l.paper);
                 return (
-                  <button key={l.id} className="letter-card" style={{ background: s.bg }} onClick={() => go('letters')}>
+                  <button key={l.id} className="letter-card" style={{ background: p.bg, color: p.ink }} onClick={() => go('letters')}>
                     <span className="letter-icon">{s.icon}</span>
                     <strong>From. {l.from}</strong>
                     <span className="letter-preview">{l.body}</span>

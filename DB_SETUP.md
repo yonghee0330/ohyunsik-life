@@ -26,6 +26,7 @@ letters/{autoId}
   from: string            // 최대 20자
   title: string           // 선택, 최대 40자
   body: string            // 최대 3000자
+  paper: string           // 편지지 id (cream, dawn, blossom, forest, sunset, sea, night)
   createdAt: timestamp
 
 gratitude/{autoId}
@@ -93,7 +94,8 @@ service cloud.firestore {
     match /letters/{id} {
       allow read: if true;
       allow create: if signedIn()
-        && request.resource.data.keys().hasOnly(['from', 'title', 'body', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['from', 'title', 'body', 'paper', 'createdAt'])
+        && (!('paper' in request.resource.data) || str(request.resource.data.paper, 1, 20))
         && str(request.resource.data.from, 1, 20)
         && str(request.resource.data.title, 0, 40)
         && str(request.resource.data.body, 1, 3000);

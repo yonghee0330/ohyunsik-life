@@ -49,10 +49,10 @@ const list = async (name, dir) => {
 // ---------- 편지 ----------
 export const listLetters = () => list('letters', 'desc');
 
-export async function addLetter({ from, title, body }) {
+export async function addLetter({ from, title, body, paper = 'cream' }) {
   await ready;
-  const r = await addDoc(collection(db, 'letters'), { from, title, body, createdAt: serverTimestamp() });
-  return { id: r.id, from, title, body, createdAt: Date.now() };
+  const r = await addDoc(collection(db, 'letters'), { from, title, body, paper, createdAt: serverTimestamp() });
+  return { id: r.id, from, title, body, paper, createdAt: Date.now() };
 }
 
 // ---------- 감사 100가지 ----------

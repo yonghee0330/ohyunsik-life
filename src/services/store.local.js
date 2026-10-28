@@ -36,8 +36,8 @@ export async function listLetters() {
   return read('letters', []).sort((a, b) => b.createdAt - a.createdAt);
 }
 
-export async function addLetter({ from, title, body }) {
-  const item = { id: uid(), from, title, body, createdAt: Date.now() };
+export async function addLetter({ from, title, body, paper = 'cream' }) {
+  const item = { id: uid(), from, title, body, paper, createdAt: Date.now() };
   write('letters', [item, ...read('letters', [])]);
   return item;
 }
