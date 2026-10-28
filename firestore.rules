@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isFamily() {
+      return signedIn() && exists(/databases/$(db)/documents/familyMembers/$(request.auth.uid));
+    }
+    function str(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
+
+    match /settings/{doc} { allow read, write: if false; }
+
+    match /familyMembers/{uid} {
+      allow read: if false;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.pin == get(/databases/$(db)/documents/settings/access).data.pin;
+      allow delete: if false;
+    }
+
+    match /letters/{id} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['from', 'title', 'body', 'createdAt'])
+        && str(request.resource.data.from, 1, 20)
+        && str(request.resource.data.title, 0, 40)
+        && str(request.resource.data.body, 1, 3000);
+      allow update, delete: if false;          // 지울 일은 콘솔에서
+    }
+
+    match /gratitude/{id} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['name', 'text', 'createdAt'])
+        && str(request.resource.data.name, 1, 20)
+        && str(request.resource.data.text, 1, 120);
+      allow update, delete: if false;
+    }
+
+    match /voices/{id} {
+      allow read: if true;
+      // 질문은 누구나 남기고, 답변(수정)과 삭제는 가족만
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['question', 'askedBy', 'audio', 'audioPath', 'text', 'answeredAt', 'createdAt'])
+        && str(request.resource.data.question, 1, 200)
+        && str(request.resource.data.askedBy, 1, 20)
+        && request.resource.data.audio == '' && request.resource.data.text == ''
+        && request.resource.data.answeredAt == null;
+      allow update, delete: if isFamily();
+    }
+
+    match /photos/{id} {
+      allow read: if true;
+      allow create, update, delete: if isFamily();
+    }
+  }
+}

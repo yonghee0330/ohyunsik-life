@@ -8,7 +8,11 @@
 npm install
 npm run dev      # http://localhost:5173
 npm run build    # dist/ 폴더에 배포용 파일 생성
+npx firebase-tools deploy --only hosting   # 오현식.kr(Firebase Hosting)에 배포
 ```
+
+- 로컬 실행에는 `.env.local`(Firebase 설정값 6개)이 필요합니다. git에는 올라가지 않습니다.
+- 보안 규칙을 고친 뒤에는 `npx firebase-tools deploy --only firestore:rules,storage`
 
 ## 화면 구성
 
@@ -32,14 +36,10 @@ npm run build    # dist/ 폴더에 배포용 파일 생성
 연표 글과 사진 설명·시기는 사진에 찍힌 날짜와 분위기로 임시로 적은 것이니 가족분들이 확인해 주세요.
 지도의 장소 중 좌표가 없는 곳은 '어디였을까요?' 목록에 나옵니다. `PLACES`에 `lat`, `lng`를 넣으면 핀이 꽂힙니다.
 
-## DB 연결 (별도 프로젝트에서 세팅)
+## DB (Firebase)
 
-> 자세한 절차·보안 규칙·체크리스트는 **[DB_SETUP.md](DB_SETUP.md)**, 바로 바꿔 끼울 Firebase 코드는 `src/services/store.firebase.js`에 있습니다.
-
-지금은 모든 데이터를 **브라우저 localStorage**에 저장합니다. 그래서 글을 쓴 기기에서만 보입니다.
-DB를 붙일 때는 `src/services/store.js`의 함수 **안쪽만** 바꾸면 됩니다. 화면 코드는 고칠 필요가 없습니다.
-모든 함수는 Promise를 돌려주므로 그대로 `await` 호출로 바꾸면 됩니다.
-
-컬렉션: `letters`, `gratitude`, `voices`, `photos` (구조는 DB_SETUP.md 2번).
-녹음은 지금 dataURL로 저장하고, DB 연결 시 Storage에 올립니다.
-가족 비밀번호 `0000`은 임시값입니다. 배포 전에 꼭 바꾸세요.
+- 프로젝트: `ohyunsik-life` (Firestore + Storage + 익명 로그인)
+- 저장 코드: `src/services/store.js` (예전 브라우저 저장 방식은 `store.local.js`)
+- 보안 규칙: `firestore.rules`, `storage.rules`
+- 컬렉션: `letters`, `gratitude`, `voices`, `photos`, `settings/access`(가족 비밀번호), `familyMembers`
+- 자세한 구조와 규칙 설명은 [DB_SETUP.md](DB_SETUP.md)

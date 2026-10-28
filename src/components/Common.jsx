@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { go } from '../router.js';
-import { SITE } from '../config.js';
 import { checkFamilyPin, isFamily } from '../services/store.js';
 
 export function SubHeader({ title, subtitle }) {
@@ -72,7 +71,7 @@ function FamilyGate({ onClose, onPass }) {
     e.preventDefault();
     if (!pin) return setError('가족 비밀번호를 입력해 주세요.');
     setBusy(true);
-    const ok = await checkFamilyPin(pin, SITE.familyPin);
+    const ok = await checkFamilyPin(pin);
     setBusy(false);
     ok ? onPass() : setError('비밀번호가 맞지 않아요. 다시 입력해 주세요.');
   };
