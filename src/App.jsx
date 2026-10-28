@@ -1,15 +1,25 @@
 import { useEffect, useState } from 'react';
 import Home from './pages/Home.jsx';
-import StoryBook from './pages/StoryBook.jsx';
+import Timeline from './pages/Timeline.jsx';
+import Letters from './pages/Letters.jsx';
+import LetterWrite from './pages/LetterWrite.jsx';
+import Voice from './pages/Voice.jsx';
+import Gratitude from './pages/Gratitude.jsx';
+import Video from './pages/Video.jsx';
+import Places from './pages/Places.jsx';
 import Album from './pages/Album.jsx';
-import GuestbookWrite from './pages/GuestbookWrite.jsx';
 import { currentRoute } from './router.js';
 
 const ROUTES = {
   '': Home,
-  story: StoryBook,
+  timeline: Timeline,
+  letters: Letters,
+  'write-letter': LetterWrite,
+  voice: Voice,
+  gratitude: Gratitude,
+  video: Video,
+  places: Places,
   album: Album,
-  write: GuestbookWrite,
 };
 
 export default function App() {

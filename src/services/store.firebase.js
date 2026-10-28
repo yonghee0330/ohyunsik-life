@@ -9,8 +9,6 @@ import {
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
-const AI_MODEL = 'gemini-2.5-flash';
-
 const app = initializeApp({
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -43,13 +41,71 @@ const list = async (name, dir) => {
   return snap.docs.map(toItem);
 };
 
-// ---------- 방명록 ----------
-export const listGuestbook = () => list('guestbook', 'desc');
+// ---------- 편지 ----------
+export const listLetters = () => list('letters', 'desc');
 
-export async function addGuestbook({ name, message }) {
+export async function addLetter({ from, title, body }) {
   await ready;
-  const r = await addDoc(collection(db, 'guestbook'), { name, message, createdAt: serverTimestamp() });
-  return { id: r.id, name, message, createdAt: Date.now() };
+  const r = await addDoc(collection(db, 'letters'), { from, title, body, createdAt: serverTimestamp() });
+  return { id: r.id, from, title, body, createdAt: Date.now() };
+}
+
+// ---------- 감사 100가지 ----------
+export const listGratitude = () => list('gratitude', 'asc');
+
+export async function addGratitude({ name, text }) {
+  await ready;
+  const r = await addDoc(collection(db, 'gratitude'), { name, text, createdAt: serverTimestamp() });
+  return { id: r.id, name, text, createdAt: Date.now() };
+}
+
+// ---------- 아버님의 목소리 ----------
+export async function listVoices() {
+  const items = await list('voices', 'desc');
+  return items.map((v) => ({ ...v, answeredAt: v.answeredAt || 0, audio: v.audio || '', text: v.text || '' }));
+}
+
+export async function addQuestion({ question, askedBy }) {
+  await ready;
+  const r = await addDoc(collection(db, 'voices'), {
+    question, askedBy, audio: '', audioPath: '', text: '', answeredAt: null, createdAt: serverTimestamp(),
+  });
+  return { id: r.id, question, askedBy, audio: '', text: '', createdAt: Date.now(), answeredAt: 0 };
+}
+
+// audio는 화면에서 dataURL로 넘어옵니다. Storage에 올리고 URL을 저장합니다.
+export async function answerVoice(id, { audio, text }) {
+  const me = await uid();
+  let url = '';
+  let audioPath = '';
+  if (audio) {
+    const blob = await (await fetch(audio)).blob();
+    const ext = blob.type.includes('mp4') ? 'm4a' : blob.type.includes('ogg') ? 'ogg' : 'webm';
+    audioPath = `voices/${me}/${Date.now()}.${ext}`;
+    const fileRef = ref(storage, audioPath);
+    await uploadBytes(fileRef, blob, { contentType: blob.type });
+    url = await getDownloadURL(fileRef);
+  }
+  await updateDoc(doc(db, 'voices', id), { audio: url, audioPath, text, answeredAt: serverTimestamp() });
+}
+
+export async function deleteVoice(id) {
+  await ready;
+  const d = await getDoc(doc(db, 'voices', id));
+  const path = d.exists() ? d.data().audioPath : '';
+  if (path) {
+    try { await deleteObject(ref(storage, path)); } catch (e) { console.warn('Storage 삭제 실패(문서는 지웁니다):', e); }
+  }
+  await deleteDoc(doc(db, 'voices', id));
+}
+
+export function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = () => reject(new Error('녹음을 저장할 수 없어요.'));
+    r.readAsDataURL(blob);
+  });
 }
 
 // ---------- 사진첩 ----------
@@ -85,75 +141,6 @@ export async function deletePhoto(id) {
     }
   }
   await deleteDoc(doc(db, 'photos', id));
-}
-
-// ---------- 인생 기록장 ----------
-export const listStories = () => list('stories', 'desc');
-
-export async function saveStory(story) {
-  await ready;
-  const { id, topic, title, body, answers = [], photoIds = [] } = story;
-  const data = { topic, title, body, answers, photoIds, updatedAt: serverTimestamp() };
-  if (id) {
-    await updateDoc(doc(db, 'stories', id), data);
-    return story;
-  }
-  const r = await addDoc(collection(db, 'stories'), { ...data, createdAt: serverTimestamp() });
-  return { ...story, id: r.id, createdAt: Date.now(), updatedAt: Date.now() };
-}
-
-export async function deleteStory(id) {
-  await ready;
-  await deleteDoc(doc(db, 'stories', id));
-}
-
-// 이어서 쓰기 임시본은 기기에만 둡니다.
-const DRAFT_KEY = 'ohs-life:draft';
-export async function getDraft() {
-  try { return JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch { return null; }
-}
-export async function saveDraft(draft) {
-  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); } catch { /* 무시 */ }
-}
-export async function clearDraft() {
-  try { localStorage.removeItem(DRAFT_KEY); } catch { /* 무시 */ }
-}
-
-// 답변 → 한 편의 글. VITE_USE_AI=true면 Gemini로 다듬고, 실패하면 단순 정리.
-export async function composeStory(topicTitle, answers) {
-  const filled = answers.filter((a) => a.answer.trim());
-  if (!filled.length) return { title: `${topicTitle} 이야기`, body: '' };
-  if (import.meta.env.VITE_USE_AI === 'true') {
-    try {
-      return await composeWithAI(topicTitle, filled);
-    } catch (e) {
-      console.warn('AI 정리 실패, 단순 정리로 전환:', e);
-    }
-  }
-  const lines = filled.map((a) => a.answer.trim()).map((t) => (/[.!?다요음]$/.test(t) ? t : t + '.'));
-  return {
-    title: `${topicTitle}의 추억`,
-    body: [`나는 ${topicTitle}에 대해 이렇게 기억한다.`, ...lines, '지금도 그 시절을 떠올리면 마음이 따뜻해진다.'].join('\n\n'),
-  };
-}
-
-async function composeWithAI(topicTitle, answers) {
-  const { getAI, getGenerativeModel, GoogleAIBackend } = await import('firebase/ai');
-  const ai = getAI(app, { backend: new GoogleAIBackend() });
-  const model = getGenerativeModel(ai, { model: AI_MODEL });
-  const qa = answers.map((a) => `Q. ${a.question}\nA. ${a.answer}`).join('\n\n');
-  const prompt = [
-    `아래는 아버지가 "${topicTitle}"에 대해 답한 내용입니다.`,
-    '이것을 본인이 쓴 것처럼 1인칭 회고체의 짧은 글(3~6문단)로 다듬어 주세요.',
-    '규칙: 답변에 없는 사실·이름·날짜를 지어내지 말 것. 말투는 따뜻하고 담백하게. 마지막은 감사와 긍정으로.',
-    '출력 형식: 첫 줄은 제목만, 빈 줄 하나, 그 다음 본문.',
-    '',
-    qa,
-  ].join('\n');
-  const res = await model.generateContent(prompt);
-  const text = res.response.text().trim();
-  const [first, ...rest] = text.split('\n');
-  return { title: first.replace(/^[#\s"“]+|["”]+$/g, '').trim(), body: rest.join('\n').trim() };
 }
 
 // ---------- 가족 확인 ----------

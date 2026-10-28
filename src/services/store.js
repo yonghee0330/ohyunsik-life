@@ -3,11 +3,11 @@
 // DB(Firebase/Supabase 등)를 연결할 때는 아래 함수들의 "안쪽"만 바꾸면
 // 화면 코드는 그대로 동작합니다. 모든 함수는 Promise를 돌려줍니다.
 //
-// 컬렉션 구조 (README.md 참고)
-//   guestbook : { id, name, message, createdAt }
-//   photos    : { id, src, title, era, story, createdAt }   ← 사진첩에 가족이 올린 사진
-//   stories   : { id, topic, title, body, answers[], photoIds[], createdAt, updatedAt }
-//   drafts    : { topic, answers[] }                         ← 이어서 쓰기용
+// 컬렉션 구조 (DB_SETUP.md 참고)
+//   letters   : { id, from, title, body, createdAt }
+//   gratitude : { id, name, text, createdAt }
+//   voices    : { id, question, askedBy, audio, text, createdAt, answeredAt }
+//   photos    : { id, src, title, era, story, createdAt }   <- 사진첩에 가족이 올린 사진
 
 const KEY = 'ohs-life:';
 
@@ -31,15 +31,55 @@ function write(name, value) {
 
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
-// ---------- 방명록 ----------
-export async function listGuestbook() {
-  return read('guestbook', []).sort((a, b) => b.createdAt - a.createdAt);
+// ---------- 편지 (아버님께 드리는 편지) ----------
+export async function listLetters() {
+  return read('letters', []).sort((a, b) => b.createdAt - a.createdAt);
 }
 
-export async function addGuestbook({ name, message }) {
-  const item = { id: uid(), name, message, createdAt: Date.now() };
-  write('guestbook', [item, ...read('guestbook', [])]);
+export async function addLetter({ from, title, body }) {
+  const item = { id: uid(), from, title, body, createdAt: Date.now() };
+  write('letters', [item, ...read('letters', [])]);
   return item;
+}
+
+// ---------- 감사 100가지 ----------
+export async function listGratitude() {
+  return read('gratitude', []).sort((a, b) => a.createdAt - b.createdAt);
+}
+
+export async function addGratitude({ name, text }) {
+  const item = { id: uid(), name, text, createdAt: Date.now() };
+  write('gratitude', [...read('gratitude', []), item]);
+  return item;
+}
+
+// ---------- 아버님의 목소리 (질문 → 음성 답변) ----------
+export async function listVoices() {
+  return read('voices', []).sort((a, b) => b.createdAt - a.createdAt);
+}
+
+export async function addQuestion({ question, askedBy }) {
+  const item = { id: uid(), question, askedBy, audio: '', text: '', createdAt: Date.now(), answeredAt: 0 };
+  write('voices', [item, ...read('voices', [])]);
+  return item;
+}
+
+// audio: dataURL(녹음). DB 연결 시 Storage에 올리고 URL을 audio에 저장하세요.
+export async function answerVoice(id, { audio, text }) {
+  write('voices', read('voices', []).map((v) => (v.id === id ? { ...v, audio, text, answeredAt: Date.now() } : v)));
+}
+
+export async function deleteVoice(id) {
+  write('voices', read('voices', []).filter((v) => v.id !== id));
+}
+
+export function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = () => reject(new Error('녹음을 저장할 수 없어요.'));
+    r.readAsDataURL(blob);
+  });
 }
 
 // ---------- 사진첩 (가족이 올린 사진) ----------
@@ -61,53 +101,6 @@ export async function updatePhoto(id, patch) {
 
 export async function deletePhoto(id) {
   write('photos', read('photos', []).filter((p) => p.id !== id));
-}
-
-// ---------- 인생 기록장 ----------
-export async function listStories() {
-  return read('stories', []).sort((a, b) => b.createdAt - a.createdAt);
-}
-
-export async function saveStory(story) {
-  const all = read('stories', []);
-  const now = Date.now();
-  if (story.id) {
-    write('stories', all.map((s) => (s.id === story.id ? { ...s, ...story, updatedAt: now } : s)));
-    return story;
-  }
-  const item = { ...story, id: uid(), createdAt: now, updatedAt: now };
-  write('stories', [item, ...all]);
-  return item;
-}
-
-export async function deleteStory(id) {
-  write('stories', read('stories', []).filter((s) => s.id !== id));
-}
-
-export async function getDraft() {
-  return read('draft', null);
-}
-
-export async function saveDraft(draft) {
-  write('draft', draft);
-}
-
-export async function clearDraft() {
-  localStorage.removeItem(KEY + 'draft');
-}
-
-// 답변들을 한 편의 글로 정리합니다.
-// 지금은 단순 이어붙이기입니다. AI(Gemini/Claude 등) 연결 시 이 함수만 교체하세요.
-export async function composeStory(topicTitle, answers) {
-  const lines = answers
-    .map((a) => a.answer.trim())
-    .filter(Boolean)
-    .map((t) => (/[.!?다요음]$/.test(t) ? t : t + '.'));
-  if (!lines.length) return { title: `${topicTitle} 이야기`, body: '' };
-  return {
-    title: `${topicTitle}의 추억`,
-    body: [`나는 ${topicTitle}에 대해 이렇게 기억한다.`, ...lines, '지금도 그 시절을 떠올리면 마음이 따뜻해진다.'].join('\n\n'),
-  };
 }
 
 // ---------- 가족 확인 ----------

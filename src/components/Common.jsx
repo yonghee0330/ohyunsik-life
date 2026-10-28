@@ -104,3 +104,24 @@ export function formatDate(ts) {
   const d = new Date(ts);
   return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
 }
+
+// 사진을 크게 보는 창. 여러 장이면 좌우로 넘길 수 있어요.
+export function Lightbox({ photos, index, onClose }) {
+  const [i, setI] = useState(index);
+  const p = photos[i];
+  return (
+    <Modal onClose={onClose}>
+      <img className="viewer-img" src={p.src} alt={p.caption} />
+      <p className="viewer-cap">{p.caption}</p>
+      <div className="row center">
+        {photos.length > 1 && (
+          <button className="btn btn-ghost" onClick={() => setI((i - 1 + photos.length) % photos.length)}>‹ 이전</button>
+        )}
+        <button className="btn btn-ghost" onClick={onClose}>닫기</button>
+        {photos.length > 1 && (
+          <button className="btn btn-ghost" onClick={() => setI((i + 1) % photos.length)}>다음 ›</button>
+        )}
+      </div>
+    </Modal>
+  );
+}

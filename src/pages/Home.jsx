@@ -1,62 +1,46 @@
 import { useEffect, useState } from 'react';
-import { SITE } from '../config.js';
-import { QUOTES, CHAPTERS, PHOTOS, HOME_GALLERY, NOTE_STYLES } from '../data/content.js';
-import { listGuestbook, listStories } from '../services/store.js';
+import { SITE, VIDEO, GRATITUDE_GOAL } from '../config.js';
+import { TIMELINE, LETTER_STYLES, photoById } from '../data/content.js';
+import { listLetters, listGratitude, listVoices } from '../services/store.js';
 import { go } from '../router.js';
-import { Toast, Modal, formatDate } from '../components/Common.jsx';
+import { formatDate } from '../components/Common.jsx';
 
 const NAV = [
-  { id: 'quote', label: '오늘의 감사' },
-  { id: 'story', label: '인생 이야기' },
-  { id: 'gallery', label: '갤러리' },
-  { id: 'guestbook', label: '방명록/소통' },
+  { id: 'timeline', label: '인생 연표' },
+  { id: 'letters', label: '편지' },
+  { id: 'voice', label: '목소리' },
+  { id: 'gratitude', label: '감사 100가지' },
+  { id: 'video', label: '영상관' },
+  { id: 'places', label: '걸어온 곳' },
 ];
 
-function scrollToId(id) {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+const scrollToId = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+function Head({ eyebrow, title, desc }) {
+  return (
+    <div className="section-head">
+      <p className="eyebrow">{eyebrow}</p>
+      <h2>{title}</h2>
+      <p className="muted">{desc}</p>
+    </div>
+  );
 }
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [quoteIdx, setQuoteIdx] = useState(() => new Date().getDate() % QUOTES.length);
-  const [toast, setToast] = useState('');
-  const [notes, setNotes] = useState([]);
-  const [storyCount, setStoryCount] = useState(0);
-  const [viewer, setViewer] = useState(null);
+  const [letters, setLetters] = useState([]);
+  const [gratitude, setGratitude] = useState([]);
+  const [voices, setVoices] = useState([]);
 
   useEffect(() => {
-    listGuestbook().then(setNotes);
-    listStories().then((s) => setStoryCount(s.length));
+    listLetters().then(setLetters);
+    listGratitude().then(setGratitude);
+    listVoices().then(setVoices);
   }, []);
 
-  const quote = QUOTES[quoteIdx];
-  const gallery = HOME_GALLERY.map((id) => PHOTOS.find((p) => p.id === id)).filter(Boolean);
-
-  const nextQuote = () => {
-    let n = quoteIdx;
-    while (n === quoteIdx && QUOTES.length > 1) n = Math.floor(Math.random() * QUOTES.length);
-    setQuoteIdx(n);
-  };
-
-  const share = async () => {
-    const text = `“${quote.text}”\n— ${SITE.name}의 ${SITE.title} —\n${window.location.origin}`;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: `${SITE.name} | ${SITE.title}`, text });
-        setToast('공유 창을 열었어요.');
-      } else {
-        await navigator.clipboard.writeText(text);
-        setToast('문구를 복사했어요. 카카오톡에 붙여넣기 하세요.');
-      }
-    } catch {
-      setToast('공유가 취소되었거나 지원되지 않아요.');
-    }
-  };
-
-  const navClick = (id) => {
-    setMenuOpen(false);
-    scrollToId(id);
-  };
+  const answered = voices.filter((v) => v.answeredAt);
+  const latestVoice = answered[0];
+  const pct = Math.min(100, Math.round((gratitude.length / GRATITUDE_GOAL) * 100));
 
   return (
     <>
@@ -68,7 +52,7 @@ export default function Home() {
         </button>
         <nav className={menuOpen ? 'nav-links open' : 'nav-links'}>
           {NAV.map((n) => (
-            <button key={n.id} onClick={() => navClick(n.id)}>{n.label}</button>
+            <button key={n.id} onClick={() => { setMenuOpen(false); scrollToId(n.id); }}>{n.label}</button>
           ))}
         </nav>
         <button className="menu-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="메뉴">메뉴</button>
@@ -85,7 +69,10 @@ export default function Home() {
               {SITE.name}의 <em>‘{SITE.title}’</em>
             </h1>
             <p className="lead">{SITE.heroSub}</p>
-            <button className="btn btn-primary" onClick={() => scrollToId('quote')}>오늘의 감사 한 줄 읽기</button>
+            <div className="row" style={{ marginTop: 0 }}>
+              <button className="btn btn-primary" onClick={() => go('timeline')}>인생 연표 보기</button>
+              <button className="btn btn-ghost" onClick={() => go('write-letter')}>편지 쓰기</button>
+            </div>
           </div>
           <figure className="hero-photo">
             <img src={SITE.heroPhoto} alt={`${SITE.name}님`} />
@@ -93,119 +80,94 @@ export default function Home() {
           </figure>
         </section>
 
-        {/* QUOTE */}
-        <section id="quote" className="section">
-          <div className="section-head">
-            <p className="eyebrow">DAILY GRATITUDE</p>
-            <h2>오늘의 감사 구절</h2>
-            <p className="muted">지나온 날을 긍정하는 한 줄로, 오늘을 조금 더 따뜻하게</p>
-          </div>
-          <div className="quote-card" style={{ backgroundImage: `url(${quote.bg})` }}>
-            <div className="quote-inner">
-              <span className="quote-mark">“</span>
-              <p className="quote-text">{quote.text}</p>
-              <p className="quote-by">— {SITE.name}의 인생 메세지 —</p>
-            </div>
-          </div>
-          <div className="row center">
-            <button className="btn btn-ghost" onClick={nextQuote}>오늘의 구절 바꾸기</button>
-            <button className="btn btn-soft" onClick={share}>카카오톡으로 공유하기</button>
-          </div>
-        </section>
-
-        {/* LIFE STORY */}
-        <section id="story" className="section section-alt">
-          <div className="section-head">
-            <p className="eyebrow">LIFE STORY</p>
-            <h2>{SITE.name}의 인생 이야기</h2>
-            <p className="muted">청년의 꿈에서 오늘의 감사까지, 이어지는 이야기</p>
-          </div>
-          <div className="chapters">
-            {CHAPTERS.map((c, i) => (
-              <article key={c.title} className={i % 2 ? 'chapter reverse' : 'chapter'}>
-                <div className="chapter-text">
-                  <p className="chapter-label">{c.label}</p>
-                  <h3>{c.title}</h3>
-                  <p>{c.body}</p>
-                </div>
-                <img src={c.photo} alt={c.title} loading="lazy" />
-              </article>
-            ))}
-          </div>
-          <div className="row center">
-            <button className="btn btn-primary" onClick={() => go('story')}>
-              나의 인생 기록장 열기{storyCount ? ` · 남겨진 기록 ${storyCount}편` : ''}
-            </button>
-          </div>
-        </section>
-
-        {/* GALLERY */}
-        <section id="gallery" className="section">
-          <div className="section-head">
-            <p className="eyebrow">GALLERY</p>
-            <h2>아름다운 순간들</h2>
-            <p className="muted">흑백 사진부터 졸업식까지, 세월이 담긴 사진들</p>
-          </div>
-          <div className="gallery">
-            {gallery.map((p) => (
-              <button key={p.id} className="g-item" onClick={() => setViewer(p)}>
-                <img src={p.src} alt={p.caption} loading="lazy" />
-                <span>{p.caption}</span>
+        {/* 인생 연표 */}
+        <section id="timeline" className="section section-alt">
+          <Head eyebrow="LIFE TIMELINE" title="인생 연표" desc="청년의 꿈에서 오늘의 감사까지, 시간 순서대로 따라가 보세요" />
+          <div className="tl-strip">
+            {TIMELINE.map((t, i) => (
+              <button key={i} className="tl-chip" onClick={() => go('timeline')}>
+                <img src={photoById(t.photos[0])?.src} alt={t.title} loading="lazy" />
+                <span className="tl-chip-when">{t.when}</span>
+                <strong>{t.title}</strong>
               </button>
             ))}
           </div>
-          <div className="row center">
-            <button className="btn btn-primary" onClick={() => go('album')}>추억의 사진첩 열기</button>
-          </div>
+          <div className="row center"><button className="btn btn-primary" onClick={() => go('timeline')}>연표 전체 보기</button></div>
         </section>
 
-        {/* GUESTBOOK */}
-        <section id="guestbook" className="section section-alt">
-          <div className="section-head">
-            <p className="eyebrow">COMMUNITY</p>
-            <h2>따뜻한 한마디</h2>
-            <p className="muted">가족과 친구가 전하는 생신 축하와 감사의 마음을 남겨 주세요</p>
-          </div>
-          <div className="row center" style={{ marginBottom: 24 }}>
-            <button className="btn btn-primary" onClick={() => go('write')}>한마디 남기기</button>
-          </div>
-          {notes.length === 0 ? (
-            <div className="empty">
-              <p>아직 남겨진 말이 없어요.</p>
-              <p className="muted">첫 번째 따뜻한 한마디를 남겨 주세요.</p>
-            </div>
+        {/* 편지 */}
+        <section id="letters" className="section">
+          <Head eyebrow="LETTERS" title="아버님께 드리는 편지" desc="짧은 인사보다, 마음을 꾹꾹 눌러 쓴 긴 편지를 모았어요" />
+          {letters.length === 0 ? (
+            <div className="empty"><p>아직 도착한 편지가 없어요.</p><p className="muted">첫 번째 편지의 주인공이 되어 주세요.</p></div>
           ) : (
             <div className="notes">
-              {notes.map((n, i) => {
-                const s = NOTE_STYLES[i % NOTE_STYLES.length];
+              {letters.slice(0, 3).map((l, i) => {
+                const s = LETTER_STYLES[i % LETTER_STYLES.length];
                 return (
-                  <article key={n.id} className="note" style={{ background: s.bg }}>
-                    <div className="note-head">
-                      <strong>From. {n.name}</strong>
-                      <span>{s.icon}</span>
-                    </div>
-                    <p>{n.message}</p>
-                    <time>{formatDate(n.createdAt)}</time>
-                  </article>
+                  <button key={l.id} className="letter-card" style={{ background: s.bg }} onClick={() => go('letters')}>
+                    <span className="letter-icon">{s.icon}</span>
+                    <strong>From. {l.from}</strong>
+                    <span className="letter-preview">{l.body}</span>
+                    <time>{formatDate(l.createdAt)}</time>
+                  </button>
                 );
               })}
             </div>
           )}
+          <div className="row center">
+            {letters.length > 0 && <button className="btn btn-ghost" onClick={() => go('letters')}>편지 모두 읽기 ({letters.length})</button>}
+            <button className="btn btn-primary" onClick={() => go('write-letter')}>편지 쓰기</button>
+          </div>
+        </section>
+
+        {/* 목소리 */}
+        <section id="voice" className="section section-alt">
+          <Head eyebrow="VOICE" title={`${SITE.honorific}의 목소리`} desc="궁금했던 것을 물어보면, 아버님이 목소리로 들려주세요" />
+          <div className="card voice-teaser">
+            {latestVoice ? (
+              <>
+                <p className="q">Q. {latestVoice.question}</p>
+                {latestVoice.audio ? <audio controls preload="none" src={latestVoice.audio} /> : <p className="voice-text">{latestVoice.text}</p>}
+              </>
+            ) : (
+              <p className="muted center">아직 녹음된 이야기가 없어요. 질문을 남겨 두면 아버님이 시간 날 때 들려주실 거예요.</p>
+            )}
+          </div>
+          <div className="row center"><button className="btn btn-primary" onClick={() => go('voice')}>질문 남기기 · 이야기 듣기{answered.length ? ` (${answered.length})` : ''}</button></div>
+        </section>
+
+        {/* 감사 100가지 */}
+        <section id="gratitude" className="section">
+          <Head eyebrow="100 THANKS" title="감사 100가지" desc="가족이 한 줄씩 보태서, 고마운 이유 100가지를 채워 가요" />
+          <div className="card progress-card" style={{ maxWidth: 560, margin: '0 auto' }}>
+            <p className="count"><strong>{gratitude.length}</strong> / {GRATITUDE_GOAL}</p>
+            <div className="bar-track"><div className="bar-fill" style={{ width: `${pct}%` }} /></div>
+            {gratitude.length > 0 && (
+              <p className="muted small" style={{ marginTop: 10 }}>최근: “{gratitude[gratitude.length - 1].text}” — {gratitude[gratitude.length - 1].name}</p>
+            )}
+          </div>
+          <div className="row center"><button className="btn btn-primary" onClick={() => go('gratitude')}>감사 한 줄 보태기</button></div>
+        </section>
+
+        {/* 영상관 */}
+        <section id="video" className="section section-alt">
+          <Head eyebrow="FAMILY FILM" title="가족 영상관" desc={VIDEO.desc} />
+          <div className="row center" style={{ marginTop: 0 }}>
+            <button className="btn btn-primary" onClick={() => go('video')}>영상 보러 가기</button>
+          </div>
+        </section>
+
+        {/* 걸어온 곳 */}
+        <section id="places" className="section">
+          <Head eyebrow="PLACES" title="함께 걸어온 곳" desc="제주, 남산, 바닷가…… 지도 위에 사진을 꽂아 두었어요" />
+          <div className="row center" style={{ marginTop: 0 }}>
+            <button className="btn btn-primary" onClick={() => go('places')}>지도 보러 가기</button>
+          </div>
         </section>
       </main>
 
       <footer className="footer">© {SITE.name} | {SITE.title}. All rights reserved.</footer>
-
-      {viewer && (
-        <Modal onClose={() => setViewer(null)}>
-          <img className="viewer-img" src={viewer.src} alt={viewer.caption} />
-          <p className="viewer-cap">{viewer.caption}</p>
-          <div className="row center">
-            <button className="btn btn-ghost" onClick={() => setViewer(null)}>닫기</button>
-          </div>
-        </Modal>
-      )}
-      <Toast message={toast} onDone={() => setToast('')} />
     </>
   );
 }
