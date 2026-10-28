@@ -36,7 +36,7 @@ export default function LetterShow({ letters, onClose, onPlayAll }) {
   const steps = useMemo(() => buildSteps(letters), [letters]);
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const [music, setMusic] = useState(true);
+  const [music, setMusic] = useState(false); // 기본은 음악 꺼짐
   const [needTap, setNeedTap] = useState(false);
   const [done, setDone] = useState(false);
   const timer = useRef(null);
@@ -128,8 +128,8 @@ export default function LetterShow({ letters, onClose, onPlayAll }) {
 
       {!done && (
         <div className="show-top">
-          <button className="show-icon" onClick={toggleMusic} aria-label={music ? '음악 끄기' : '음악 켜기'} title={music ? '음악 끄기' : '음악 켜기'}>
-            {music ? '♪' : <span className="muted-note">♪</span>}
+          <button className={music ? 'show-icon' : 'show-icon off'} onClick={toggleMusic} aria-label={music ? '음악 끄기' : '음악 켜기'} title={music ? '음악 끄기' : '음악 켜기'}>
+            {music ? '♪' : <><span className="muted-note">♪</span> 음악 켜기</>}
           </button>
           <button className="show-skip" onClick={onClose}>닫기 ✕</button>
         </div>

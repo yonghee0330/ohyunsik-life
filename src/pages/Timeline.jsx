@@ -33,7 +33,7 @@ export default function Timeline() {
   const slides = useMemo(buildSlides, []);
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const [music, setMusic] = useState(true);
+  const [music, setMusic] = useState(false); // 기본은 음악 꺼짐. 오른쪽 위 버튼을 눌러야 켜져요.
   const [needTap, setNeedTap] = useState(false); // 브라우저가 소리를 막았을 때
   const [ended, setEnded] = useState(false);
   const timer = useRef(null);
@@ -59,10 +59,9 @@ export default function Timeline() {
   }, [slides.length, finish]);
   const prev = () => setIdx((i) => Math.max(0, i - 1));
 
-  // 처음 열리면 음악부터 켜 봅니다.
+  // 음악은 기본으로 꺼져 있어요. 곡만 미리 만들어 두면, 버튼을 누르는 순간 바로 재생돼요.
   useEffect(() => {
-    prepareBgm('timeline'); // 곡을 미리 만들어 두면, 누르는 순간 바로 재생돼요.
-    playBgm('timeline').then((ok) => setNeedTap(!ok));
+    prepareBgm('timeline');
     return () => stopBgm();
   }, []);
 
@@ -133,8 +132,6 @@ export default function Timeline() {
     setEnded(false);
     setIdx(0);
     setPlaying(true);
-    setMusic(true);
-    playBgm('timeline').then((ok) => setNeedTap(!ok));
   };
 
   const progress = ((idx + 1) / slides.length) * 100;
@@ -144,8 +141,8 @@ export default function Timeline() {
       {/* 오른쪽 위: 작은 음악 버튼, 연표 끄기 */}
       {!ended && (
         <div className="show-top">
-          <button className="show-icon" onClick={toggleMusic} aria-label={music ? '음악 끄기' : '음악 켜기'} title={music ? '음악 끄기' : '음악 켜기'}>
-            {music ? '♪' : <span className="muted-note">♪</span>}
+          <button className={music ? 'show-icon' : 'show-icon off'} onClick={toggleMusic} aria-label={music ? '음악 끄기' : '음악 켜기'} title={music ? '음악 끄기' : '음악 켜기'}>
+            {music ? '♪' : <><span className="muted-note">♪</span> 음악 켜기</>}
           </button>
           <button className="show-skip" onClick={skip}>연표 끄기 ✕</button>
         </div>

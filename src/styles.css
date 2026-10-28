@@ -513,3 +513,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.35; mar
 .place-photos img { width: 100%; aspect-ratio: 1; object-fit: cover; }
 .place.unpinned { cursor: default; }
 .small-btn { padding: 6px 14px; font-size: 14px; margin-top: 6px; }
+
+/* 음악이 꺼진 상태: 눈에 띄게 '음악 켜기' 글자를 함께 보여 줍니다 */
+.show-icon.off { width: auto; padding: 0 13px; border-radius: 999px; font-size: 13px; gap: 5px; display: inline-flex; align-items: center; }
+.show-icon.off .muted-note { opacity: .9; text-decoration: none; }
