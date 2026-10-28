@@ -1,7 +1,7 @@
 import { VIDEO } from '../config.js';
 import { SubHeader } from '../components/Common.jsx';
 
-function Player({ id, vertical, title }) {
+export function Player({ id, vertical, title }) {
   return (
     <div className={vertical ? 'video-frame vertical' : 'video-frame'}>
       <iframe
@@ -22,7 +22,15 @@ export default function Video() {
   return (
     <div className="page wide-page">
       <SubHeader title="가족 영상관" subtitle={VIDEO.desc} />
-      {VIDEO.items.length === 0 && (
+      {VIDEO.birthday && (
+        <section className="bday-feature">
+          <p className="eyebrow">HAPPY BIRTHDAY</p>
+          <h2>생신 축하 영상</h2>
+          <div className="bday-player"><Player {...VIDEO.birthday} title="생신 축하 영상" /></div>
+        </section>
+      )}
+      {VIDEO.items.length > 0 && <h3 className="list-h">가족의 시간</h3>}
+      {!VIDEO.birthday && VIDEO.items.length === 0 && (
         <div className="empty">
           <p className="big-icon">🎞️</p>
           <p>영상을 준비하고 있어요.</p>

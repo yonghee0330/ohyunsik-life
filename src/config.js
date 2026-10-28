@@ -16,10 +16,11 @@ export const SITE = {
 export const VIDEO = {
   title: '우리 가족의 시간',
   desc: '사진으로는 다 담지 못한 웃음소리와 목소리가 담긴 영상입니다.',
+  // 생신 축하 영상: 홈 화면 맨 앞과 영상관 맨 위에 크게 보입니다.
+  birthday: { id: 'BrHw3aj7dss', vertical: true },
   items: [
     { id: 't34aEjJb8uE', vertical: false },
     { id: 'MaisnxbzEZw', vertical: true },
-    { id: 'BrHw3aj7dss', vertical: true },
   ],
 };
 

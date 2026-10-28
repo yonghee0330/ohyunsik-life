@@ -4,6 +4,7 @@ import { TIMELINE, LETTER_STYLES, photoById } from '../data/content.js';
 import { listLetters, listGratitude, listVoices } from '../services/store.js';
 import { go } from '../router.js';
 import { formatDate } from '../components/Common.jsx';
+import { Player } from './Video.jsx';
 
 const NAV = [
   { id: 'timeline', label: '인생 연표' },
@@ -71,8 +72,8 @@ export default function Home() {
             <p className="lead">{SITE.heroSub}</p>
             <p className="profile">{SITE.profile}</p>
             <div className="row" style={{ marginTop: 0 }}>
-              <button className="btn btn-primary" onClick={() => go('timeline')}>인생 연표 보기</button>
-              <button className="btn btn-ghost" onClick={() => go('write-letter')}>편지 쓰기</button>
+              {VIDEO.birthday && <button className="btn btn-primary" onClick={() => scrollToId('birthday')}>▶ 생신 축하 영상 보기</button>}
+              <button className={VIDEO.birthday ? 'btn btn-ghost' : 'btn btn-primary'} onClick={() => go('timeline')}>인생 연표 보기</button>
             </div>
           </div>
           <figure className="hero-photo">
@@ -80,6 +81,25 @@ export default function Home() {
             <figcaption>{SITE.heroCaption}</figcaption>
           </figure>
         </section>
+
+        {/* 생신 축하 영상 */}
+        {VIDEO.birthday && (
+          <section id="birthday" className="section bday-section">
+            <div className="bday-wrap">
+              <div className="bday-player"><Player {...VIDEO.birthday} title="생신 축하 영상" /></div>
+              <div className="bday-text">
+                <p className="eyebrow">HAPPY BIRTHDAY</p>
+                <h2>{SITE.honorific}, 생신 축하드립니다</h2>
+                <p>가족들이 마음을 모아 준비한 영상이에요.<br />재생 버튼을 눌러 함께 보세요.</p>
+                <p className="muted">영상을 보시고 떠오른 마음이 있다면, 편지 한 통이나 감사 한 줄로 보태 주세요.</p>
+                <div className="row">
+                  <button className="btn btn-primary" onClick={() => go('write-letter')}>축하 편지 쓰기</button>
+                  <button className="btn btn-ghost" onClick={() => go('gratitude')}>감사 한 줄 보태기</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* 인생 연표 */}
         <section id="timeline" className="section section-alt">
