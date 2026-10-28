@@ -317,3 +317,38 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.35; mar
   .bday-text .row { justify-content: center; }
   .bday-player { max-width: 300px; }
 }
+
+/* 인생 연표 슬라이드쇼 */
+.show { position: fixed; inset: 0; background: #14110e; color: #fff; overflow: hidden; z-index: 30; }
+.show-back { position: absolute; top: 16px; left: 16px; z-index: 9; background: rgba(0,0,0,.35); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 999px; padding: 8px 16px; font-size: 14px; backdrop-filter: blur(6px); }
+.show-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.6s ease; }
+.show-slide.on { opacity: 1; }
+.show-blur { position: absolute; inset: -40px; background-size: cover; background-position: center; filter: blur(28px) brightness(.45) saturate(1.1); }
+.show-img { position: absolute; inset: 0; margin: auto; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+.show-img.kb0 { animation: kb-in 9s ease-out forwards; }
+.show-img.kb1 { animation: kb-out 9s ease-out forwards; }
+@keyframes kb-in { from { transform: scale(1); } to { transform: scale(1.08); } }
+@keyframes kb-out { from { transform: scale(1.08); } to { transform: scale(1); } }
+.show-titlecard { position: absolute; inset: 0; background: radial-gradient(ellipse at center, #3a2c22 0%, #14110e 75%); }
+.show-text { position: absolute; left: 0; right: 0; bottom: 96px; padding: 120px clamp(20px, 6vw, 80px) 0; background: linear-gradient(to top, rgba(10,8,6,.85) 0%, rgba(10,8,6,.55) 55%, transparent 100%); z-index: 3; text-align: center; animation: fade-up 1.4s ease both; }
+.show-when { display: inline-block; margin: 0 0 8px; padding: 2px 14px; border-radius: 999px; background: rgba(255,255,255,.16); font-size: 13px; letter-spacing: .06em; }
+.show-text h2 { font-size: clamp(24px, 4vw, 38px); margin: 0 0 10px; text-shadow: 0 2px 12px rgba(0,0,0,.5); }
+.show-body { max-width: 720px; margin: 0 auto; font-family: var(--serif); font-size: clamp(15px, 1.9vw, 19px); line-height: 1.9; opacity: .95; }
+.show-cap { margin: 0; font-family: var(--serif); font-size: clamp(15px, 1.9vw, 18px); opacity: .9; }
+@keyframes fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.show-ctrl { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; padding: 0 16px 18px; background: rgba(10,8,6,.85); }
+.show-bar { height: 3px; background: rgba(255,255,255,.18); margin: 0 -16px 14px; }
+.show-bar div { height: 100%; background: #e2a878; transition: width .6s; }
+.show-btns { display: flex; justify-content: center; align-items: center; gap: 10px; }
+.show-btns button { background: rgba(255,255,255,.12); color: #fff; border: 0; border-radius: 999px; min-width: 46px; height: 42px; font-size: 18px; padding: 0 14px; }
+.show-btns .show-music { font-size: 14px; }
+.show-start { position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 14px; padding: 24px; background: rgba(14,11,9,.72); backdrop-filter: blur(4px); animation: fade-up 1s ease both; }
+.show-start h1 { font-size: clamp(30px, 5vw, 48px); margin: 0; }
+.show-start p { margin: 0; font-family: var(--serif); font-size: 18px; line-height: 1.8; opacity: .92; }
+.show-play { font-size: 18px; padding: 16px 32px; margin-top: 10px; }
+.eyebrow.light { color: #e2a878; }
+.link-btn.light { color: rgba(255,255,255,.75); }
+@media (max-width: 720px) {
+  .show-text { bottom: 86px; padding-top: 80px; }
+  .show-body { font-size: 15px; line-height: 1.75; }
+}
