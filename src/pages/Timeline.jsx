@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SITE, VIDEO } from '../config.js';
 import { TIMELINE, photoById } from '../data/content.js';
 import { go } from '../router.js';
-import { playBgm, stopBgm, resumeBgm } from '../services/bgm.js';
+import { prepareBgm, playBgm, stopBgm, resumeBgm } from '../services/bgm.js';
 import { Player } from './Video.jsx';
 
 const SLIDE_MS = 6500; // 사진 한 장이 머무는 시간
@@ -37,6 +37,7 @@ export default function Timeline() {
   const timer = useRef(null);
 
   const s = slides[idx];
+  const waitingStart = needTap && music && idx === 0 && !ended;
 
   const finish = useCallback(() => {
     setEnded(true);
@@ -58,6 +59,7 @@ export default function Timeline() {
 
   // 처음 열리면 음악부터 켜 봅니다.
   useEffect(() => {
+    prepareBgm(); // 곡을 미리 만들어 두면, 누르는 순간 바로 재생돼요.
     playBgm().then((ok) => setNeedTap(!ok));
     return () => stopBgm();
   }, []);
@@ -66,10 +68,13 @@ export default function Timeline() {
   useEffect(() => {
     if (!needTap) return;
     const onFirst = () => resumeBgm().then((ok) => ok && setNeedTap(false));
-    window.addEventListener('pointerdown', onFirst);
+    // 휴대폰은 '눌러서 뗀 순간'(click, touchend)만 소리 켜기를 허락합니다.
+    window.addEventListener('click', onFirst);
+    window.addEventListener('touchend', onFirst);
     window.addEventListener('keydown', onFirst);
     return () => {
-      window.removeEventListener('pointerdown', onFirst);
+      window.removeEventListener('click', onFirst);
+      window.removeEventListener('touchend', onFirst);
       window.removeEventListener('keydown', onFirst);
     };
   }, [needTap]);
@@ -78,9 +83,11 @@ export default function Timeline() {
   useEffect(() => {
     clearTimeout(timer.current);
     if (!playing || ended) return;
+    // 소리가 막힌 기기(주로 휴대폰)에서는 여는 화면에서 '시작하기'를 누를 때까지 기다립니다.
+    if (waitingStart) return;
     timer.current = setTimeout(next, slideMs(s));
     return () => clearTimeout(timer.current);
-  }, [playing, ended, idx, next, s]);
+  }, [playing, ended, idx, next, s, waitingStart]);
 
   // 다음 사진 미리 불러오기
   useEffect(() => {
@@ -113,6 +120,13 @@ export default function Timeline() {
 
   const skip = () => { stopBgm(); go('home'); };
 
+  const startWithMusic = () => resumeBgm().then((ok) => ok && setNeedTap(false));
+  const startWithoutMusic = () => {
+    stopBgm();
+    setMusic(false);
+    setNeedTap(false);
+  };
+
   const replay = () => {
     setEnded(false);
     setIdx(0);
@@ -135,7 +149,7 @@ export default function Timeline() {
         </div>
       )}
 
-      {needTap && music && !ended && <div className="show-hint">화면을 한 번 눌러 주세요 ♪</div>}
+      {needTap && music && !ended && !waitingStart && <div className="show-hint">화면을 한 번 눌러 주세요 ♪</div>}
 
       {/* 슬라이드 */}
       {slides.map((sl, i) => (
@@ -160,6 +174,12 @@ export default function Timeline() {
           <h1>{SITE.name}</h1>
           <p className="show-opening-sub">인생은 아름다워</p>
           <p className="show-opening-line">1953년 비금도에서 오늘까지, 한 사람이 걸어온 길</p>
+          {waitingStart && (
+            <div className="show-start-btns">
+              <button className="btn btn-primary show-play" onClick={startWithMusic}>♪ 음악과 함께 시작하기</button>
+              <button className="link-btn light" onClick={(e) => { e.stopPropagation(); startWithoutMusic(); }}>음악 없이 보기</button>
+            </div>
+          )}
         </div>
       )}
       {!ended && !s.opening && (

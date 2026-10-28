@@ -386,3 +386,5 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.35; mar
 .show-finale-video { width: min(300px, 70vw, calc(54vh * 9 / 16)); margin: 8px 0 6px; flex: none; }
 .show-finale-video .video-frame { border: 5px solid #fff; box-shadow: 0 18px 40px rgba(0,0,0,.45); }
 .show-finale .btn-ghost { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(255,255,255,.3); }
+
+.show-start-btns { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 30px; animation: fade-up 1s ease .6s both; }
