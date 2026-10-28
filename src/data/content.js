@@ -23,6 +23,22 @@ export const PHOTOS = [
   { id: 'p08', src: '/photos/p08.jpg', era: '1990년대', caption: '그 시절 우리 동네 거리 풍경' },
   { id: 'p04', src: '/photos/p04.jpg', era: '2000년대', caption: '딸의 졸업식, 꽃다발보다 환한 가족' },
   { id: 'p05', src: '/photos/p05.jpg', era: '2000년대', caption: '아들의 졸업식, 자랑스러운 아버지' },
+  { id: 'f01', src: '/photos/f01.jpg', era: '낚시와 바다', caption: '갈치가 한가득, 아이처럼 환한 웃음' },
+  { id: 'f10', src: '/photos/f10.jpg', era: '낚시와 바다', caption: '2022년 9월 통영, 손바닥보다 넓은 갈치' },
+  { id: 'f11', src: '/photos/f11.jpg', era: '낚시와 바다', caption: '2022년 9월 통영, 아이스박스 가득한 은빛' },
+  { id: 'f07', src: '/photos/f07.jpg', era: '낚시와 바다', caption: '얼음 위에 가지런히 누운 갈치들' },
+  { id: 'f08', src: '/photos/f08.jpg', era: '낚시와 바다', caption: '불 밝힌 밤바다에서 올린 삼치' },
+  { id: 'f09', src: '/photos/f09.jpg', era: '낚시와 바다', caption: '팔뚝보다 긴 삼치 한 마리' },
+  { id: 'f06', src: '/photos/f06.jpg', era: '낚시와 바다', caption: '두 손으로 들어야 하는 대물' },
+  { id: 'f12', src: '/photos/f12.jpg', era: '낚시와 바다', caption: '2023년 10월 서해, 양손에 우럭' },
+  { id: 'f15', src: '/photos/f15.jpg', era: '낚시와 바다', caption: '오늘의 조과, 우럭과 볼락이 한가득' },
+  { id: 'f14', src: '/photos/f14.jpg', era: '낚시와 바다', caption: '2024년 7월 통영의 밤, 오징어 한 마리' },
+  { id: 'f13', src: '/photos/f13.jpg', era: '낚시와 바다', caption: '배 위에서 활짝 펼친 문어' },
+  { id: 'f16', src: '/photos/f16.jpg', era: '낚시와 바다', caption: '낚싯대 끝에 매달린 묵직한 문어' },
+  { id: 'f02', src: '/photos/f02.jpg', era: '낚시와 바다', caption: '잡아 온 문어, 손질을 기다리는 중' },
+  { id: 'f05', src: '/photos/f05.jpg', era: '낚시와 바다', caption: '요리사의 손으로 직접 손질하는 문어' },
+  { id: 'f03', src: '/photos/f03.jpg', era: '낚시와 바다', caption: '잘 삶아진 문어, 빛깔부터 일품' },
+  { id: 'f04', src: '/photos/f04.jpg', era: '낚시와 바다', caption: '가족을 위해 차린 문어숙회 한 접시' },
 ];
 
 export const photoById = (id) => PHOTOS.find((p) => p.id === id);
@@ -73,6 +89,12 @@ export const TIMELINE = [
     photos: ['p04', 'p05'],
   },
   {
+    when: '요즘',
+    title: '바다가 주는 낙, 손수 차린 밥상',
+    text: '요즘 아버님의 가장 큰 낙은 낚시입니다. 통영의 밤바다에서, 서해의 아침 바다에서 갈치와 삼치, 우럭과 문어를 올리며 아이처럼 웃으십니다. 집에 돌아오면 잡아 온 문어를 직접 손질해 숙회로 차려 주십니다. 평생 요리사로 살아온 손은 지금도 가족의 밥상을 책임지고 있습니다.',
+    photos: ['f01', 'f10', 'f12', 'f14', 'f13', 'f16', 'f05', 'f04'],
+  },
+  {
     when: '그리고 오늘',
     title: '오늘이 가장 아름다운 날',
     text: '지나온 모든 날에 감사하며, 인생은 정말 아름답다고 오늘도 말해 봅니다. 이 페이지에는 앞으로도 가족의 편지와 목소리, 사진이 계속 쌓여 갑니다.',
@@ -84,8 +106,10 @@ export const TIMELINE = [
 export const PLACES = [
   { id: 'bigeum', name: '신안 비금도', lat: 34.74, lng: 125.88, note: '아버님이 태어나 자란 고향', photos: [] },
   { id: 'jeju', name: '제주', lat: 33.4, lng: 126.55, note: '귤밭과 바나나, 유채꽃이 핀 들판에서', photos: ['p11', 'p13'] },
+  { id: 'tongyeong', name: '통영 바다', lat: 34.8544, lng: 128.4331, note: '갈치와 오징어를 올리던 밤바다 (2022, 2024)', photos: ['f10', 'f11', 'f14'] },
   { id: 'namsan', name: '서울 남산', lat: 37.5512, lng: 126.9882, note: '남산 돌담에 기대어 한껏 멋을 낸 날', photos: ['p12'] },
   { id: 'hanbok', name: '한복 입은 연못가', lat: null, lng: null, note: '부채를 들고 다시 신랑 신부가 된 날', photos: ['p14'] },
+  { id: 'westsea', name: '서해 바다 낚시', lat: null, lng: null, note: '2023년 10월, 양손에 우럭', photos: ['f12', 'f15'] },
   { id: 'park', name: '놀이공원', lat: null, lng: null, note: '다리 위에서 여유롭게', photos: ['p20'] },
   { id: 'ferry', name: '배 위', lat: null, lng: null, note: '바닷바람을 맞으며', photos: ['p17'] },
   { id: 'sea', name: '바닷가', lat: null, lng: null, note: '꼭 잡은 두 손', photos: ['p03'] },
@@ -110,12 +134,14 @@ export const GRATITUDE_STARTERS = [
   '언제나 믿어 주고 응원해 주셔서 감사해요.',
   '건강하게 곁에 계셔 주셔서 감사해요.',
   '평생 맛있는 밥상으로 우리를 먹여 살려 주셔서 감사해요.',
+  '직접 잡은 문어로 숙회 차려 주셔서 감사해요.',
 ];
 
 // 아버님께 드릴 질문 예시
 export const VOICE_SUGGESTIONS = [
   '비금도에서 보낸 어린 시절은 어땠어요?',
   '요리사 일을 시작하게 된 계기가 뭐예요?',
+  '낚시는 언제부터 좋아하셨어요? 지금까지 잡은 가장 큰 고기는요?',
   '3년 연애 끝에 결혼을 결심한 순간이 기억나세요?',
   '첫아이를 안았을 때 기분이 어떠셨어요?',
   '살면서 가장 힘들었던 때는 언제였고, 어떻게 이겨내셨어요?',
