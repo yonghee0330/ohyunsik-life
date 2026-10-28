@@ -11,7 +11,7 @@ const NAV = [
   { id: 'letters', label: '편지' },
   { id: 'gratitude', label: '감사' },
   { id: 'gallery', label: '갤러리' },
-  { id: 'places', label: '지도' },
+  { id: 'places', label: '추억지도' },
 ];
 
 const scrollToId = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
