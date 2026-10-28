@@ -9,9 +9,9 @@ import { PostIt } from '../components/PostIt.jsx';
 
 const NAV = [
   { id: 'letters', label: '편지' },
-  { id: 'gratitude', label: '감사 전하기' },
-  { id: 'gallery', label: '가족 갤러리' },
-  { id: 'places', label: '걸어온 곳' },
+  { id: 'gratitude', label: '감사' },
+  { id: 'gallery', label: '갤러리' },
+  { id: 'places', label: '지도' },
 ];
 
 const scrollToId = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -156,7 +156,7 @@ export default function Home() {
 
         {/* 걸어온 곳 */}
         <section id="places" className="section section-alt">
-          <Head eyebrow="PLACES" title="함께 걸어온 곳" desc="제주, 남산, 바닷가…… 지도 위에 사진을 꽂아 두었어요" />
+          <Head eyebrow="PLACES" title="함께 걸어온 곳" desc="한국 지도 위에 함께한 곳을 핀으로 꽂아 두었어요. 사진을 올려 직접 핀을 더해 보세요" />
           <div className="row center" style={{ marginTop: 0 }}>
             <button className="btn btn-primary" onClick={() => go('places')}>지도 보러 가기</button>
           </div>

@@ -148,6 +148,39 @@ export async function deletePhoto(id) {
   await deleteDoc(doc(db, 'photos', id));
 }
 
+// ---------- 함께한 곳(지도 핀) ----------
+// 사진은 사진첩과 같은 Storage 경로(photos/내uid/)에 올리고, 핀 정보는 places 컬렉션에 저장합니다.
+export const listPlaces = () => list('places', 'asc');
+
+export async function addPlace(files, { name, note, lat, lng, builtinId }) {
+  const me = await uid();
+  const photos = [];
+  for (const file of files) {
+    const blob = await resizeToBlob(file, 1280);
+    const storagePath = `photos/${me}/place-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.jpg`;
+    const fileRef = ref(storage, storagePath);
+    await uploadBytes(fileRef, blob, { contentType: 'image/jpeg' });
+    photos.push({ src: await getDownloadURL(fileRef), storagePath });
+  }
+  const data = { name, note, lat, lng, photos, createdBy: me, createdAt: serverTimestamp(), ...(builtinId && { builtinId }) };
+  const r = await addDoc(collection(db, 'places'), data);
+  return { ...data, id: r.id, createdAt: Date.now() };
+}
+
+export async function deletePlace(id) {
+  await ready;
+  const d = await getDoc(doc(db, 'places', id));
+  const photos = d.exists() ? d.data().photos || [] : [];
+  for (const p of photos) {
+    try {
+      await deleteObject(ref(storage, p.storagePath));
+    } catch (e) {
+      console.warn('Storage 삭제 실패(문서는 지웁니다):', e);
+    }
+  }
+  await deleteDoc(doc(db, 'places', id));
+}
+
 // ---------- 가족 확인 ----------
 // familyMembers/{uid}에 pin을 쓰는 데 성공하면 가족. 비교는 보안 규칙이 합니다.
 const FAMILY_KEY = 'ohs-life:family';

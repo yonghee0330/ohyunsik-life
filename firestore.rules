@@ -50,6 +50,11 @@ service cloud.firestore {
       allow update, delete: if isFamily();
     }
 
+    match /places/{id} {
+      allow read: if true;
+      allow create, update, delete: if isFamily();
+    }
+
     match /photos/{id} {
       allow read: if true;
       allow create, update, delete: if isFamily();
