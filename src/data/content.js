@@ -39,6 +39,12 @@ export const PHOTOS = [
   { id: 'f05', src: '/photos/f05.jpg', era: '낚시와 바다', caption: '요리사의 손으로 직접 손질하는 문어' },
   { id: 'f03', src: '/photos/f03.jpg', era: '낚시와 바다', caption: '잘 삶아진 문어, 빛깔부터 일품' },
   { id: 'f04', src: '/photos/f04.jpg', era: '낚시와 바다', caption: '가족을 위해 차린 문어숙회 한 접시' },
+  { id: 't03', src: '/photos/t03.jpg', era: '함께하는 요즘', caption: '초록 숲 앞, 두 분의 함박웃음' },
+  { id: 't01', src: '/photos/t01.jpg', era: '함께하는 요즘', caption: '식당에서 건배! 나란히 앉은 두 분' },
+  { id: 't02', src: '/photos/t02.jpg', era: '함께하는 요즘', caption: '한 권의 책을 함께 들여다보며' },
+  { id: 't04', src: '/photos/t04.jpg', era: '함께하는 요즘', caption: '황금빛 들판, 어깨에 두른 팔' },
+  { id: 't05', src: '/photos/t05.jpg', era: '함께하는 요즘', caption: '가을 숲길 나들이, 손 흔드는 어머님' },
+  { id: 't06', src: '/photos/t06.jpg', era: '함께하는 요즘', caption: '가을 나들이, 온 가족이 한 화면에' },
 ];
 
 export const photoById = (id) => PHOTOS.find((p) => p.id === id);
@@ -97,8 +103,8 @@ export const TIMELINE = [
   {
     when: '그리고 오늘',
     title: '오늘이 가장 아름다운 날',
-    text: '지나온 모든 날에 감사하며, 인생은 정말 아름답다고 오늘도 말해 봅니다. 이 페이지에는 앞으로도 가족의 편지와 목소리, 사진이 계속 쌓여 갑니다.',
-    photos: ['p13'],
+    text: '50년 가까이 곁을 지켜 온 아내와 나란히 웃고, 가족들과 함께 가을 숲길을 걷습니다. 지나온 모든 날에 감사하며, 인생은 정말 아름답다고 오늘도 말해 봅니다. 이 페이지에는 앞으로도 가족의 편지와 목소리, 사진이 계속 쌓여 갑니다.',
+    photos: ['t03', 't01', 't02', 't04', 't05', 't06'],
   },
 ];
 
