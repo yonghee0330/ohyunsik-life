@@ -490,3 +490,6 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.35; mar
   .gal-peek { grid-template-columns: repeat(2, 1fr); }
   .gal-stage { height: min(68vh, 560px); }
 }
+.color-picks { display: flex; justify-content: center; gap: 12px; margin: -6px 0 14px; }
+.color-pick { width: 32px; height: 32px; padding: 0; border-radius: 50%; border: 2px solid rgba(0, 0, 0, 0.14); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12); }
+.color-pick.on { border-color: #3a3126; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.8), 0 2px 6px rgba(0, 0, 0, 0.2); transform: scale(1.1); }

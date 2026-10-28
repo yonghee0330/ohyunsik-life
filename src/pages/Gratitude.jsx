@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { listGratitude, addGratitude } from '../services/store.js';
 import { SubHeader, Toast } from '../components/Common.jsx';
-import { PostIt } from '../components/PostIt.jsx';
+import { PostIt, POSTIT_COLORS, colorHex } from '../components/PostIt.jsx';
 
 export default function Gratitude() {
   const [items, setItems] = useState(null); // null = 불러오는 중
   const [name, setName] = useState('');
   const [text, setText] = useState('');
+  const [color, setColor] = useState('yellow');
   const [error, setError] = useState('');
   const [toast, setToast] = useState('');
   const [fresh, setFresh] = useState('');
@@ -22,7 +23,7 @@ export default function Gratitude() {
     if (!name.trim() || !text.trim()) return setError('이름과 전하고 싶은 마음을 적어 주세요.');
     setBusy(true);
     try {
-      await addGratitude({ name: name.trim(), text: text.trim() });
+      await addGratitude({ name: name.trim(), text: text.trim(), color });
       const before = new Set((items || []).map((g) => g.id));
       const list = await listGratitude();
       setItems(list);
@@ -46,7 +47,22 @@ export default function Gratitude() {
         <p className="thanks-count">{loaded && <><strong>{count}</strong>장의 감사가 붙었어요</>}</p>
       </div>
 
-      <form className="postit postit-form" onSubmit={submit}>
+      <form className="postit postit-form" style={{ '--c': colorHex(color) }} onSubmit={submit}>
+        <div className="color-picks" role="radiogroup" aria-label="포스트잇 색">
+          {POSTIT_COLORS.map((c) => (
+            <button
+              type="button"
+              key={c.id}
+              role="radio"
+              aria-checked={c.id === color}
+              aria-label={c.name}
+              title={c.name}
+              className={c.id === color ? 'color-pick on' : 'color-pick'}
+              style={{ background: c.hex }}
+              onClick={() => setColor(c.id)}
+            />
+          ))}
+        </div>
         <label className="sr-only" htmlFor="th-text">전하고 싶은 감사</label>
         <textarea
           id="th-text"

@@ -47,8 +47,8 @@ export async function listGratitude() {
   return read('gratitude', []).sort((a, b) => a.createdAt - b.createdAt);
 }
 
-export async function addGratitude({ name, text }) {
-  const item = { id: uid(), name, text, createdAt: Date.now() };
+export async function addGratitude({ name, text, color }) {
+  const item = { id: uid(), name, text, color, createdAt: Date.now() };
   write('gratitude', [...read('gratitude', []), item]);
   return item;
 }

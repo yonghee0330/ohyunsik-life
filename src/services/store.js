@@ -58,10 +58,10 @@ export async function addLetter({ from, title, body, paper = 'cream' }) {
 // ---------- 감사 100가지 ----------
 export const listGratitude = () => list('gratitude', 'asc');
 
-export async function addGratitude({ name, text }) {
+export async function addGratitude({ name, text, color }) {
   await ready;
-  const r = await addDoc(collection(db, 'gratitude'), { name, text, createdAt: serverTimestamp() });
-  return { id: r.id, name, text, createdAt: Date.now() };
+  const r = await addDoc(collection(db, 'gratitude'), { name, text, color, createdAt: serverTimestamp() });
+  return { id: r.id, name, text, color, createdAt: Date.now() };
 }
 
 // ---------- 아버님의 목소리 ----------
