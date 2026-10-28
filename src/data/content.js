@@ -1,3 +1,5 @@
+import { VIDEO } from '../config.js';
+
 // 화면에 고정으로 보이는 콘텐츠. 사진 설명·연도·장소는 가족이 확인해서 고쳐 주세요.
 // (정확히 아는 연도는 적고, 확실하지 않은 시기는 '청년 시절', '함께 걸은 길'처럼 연도 없이 적어 두었습니다.)
 
@@ -45,9 +47,57 @@ export const PHOTOS = [
   { id: 't04', src: '/photos/t04.jpg', era: '함께하는 요즘', caption: '황금빛 들판, 어깨에 두른 팔' },
   { id: 't05', src: '/photos/t05.jpg', era: '함께하는 요즘', caption: '가을 숲길 나들이, 손 흔드는 어머님' },
   { id: 't06', src: '/photos/t06.jpg', era: '함께하는 요즘', caption: '가을 나들이, 온 가족이 한 화면에' },
+  { id: 'g01', src: '/photos/g01.jpg', era: '가족 사진 촬영', caption: '한복 곱게 입고, “사랑하는 아버지 생신을 축하드려요”' },
+  { id: 'g02', src: '/photos/g02.jpg', era: '가족 사진 촬영', caption: '한복 차려입은 두 분, 맞잡은 손' },
+  { id: 'g03', src: '/photos/g03.jpg', era: '가족 사진 촬영', caption: '마주 보며 웃는 아버님과 사위, 맞잡은 손' },
+  { id: 'g04', src: '/photos/g04.jpg', era: '가족 사진 촬영', caption: '손을 꼭 잡고 나란히 선 아버님과 사위' },
+  { id: 'g05', src: '/photos/g05.jpg', era: '가족 사진 촬영', caption: '딸과 사위, 보랏빛 배경 앞에서 팔짱 끼고 한 컷' },
+  { id: 'g06', src: '/photos/g06.jpg', era: '가족 사진 촬영', caption: '딸과 사위, 서로 기대어 환하게' },
+  { id: 'g07', src: '/photos/g07.jpg', era: '가족 사진 촬영', caption: '분홍빛 배경 앞, 딸의 어깨를 감싼 아버님' },
+  { id: 'g08', src: '/photos/g08.jpg', era: '가족 사진 촬영', caption: '서로를 꼭 안은 두 분, 보랏빛 포옹' },
+  { id: 'g09', src: '/photos/g09.jpg', era: '가족 사진 촬영', caption: '노란 셔츠 맞춰 입은 어머님과 사위' },
+  { id: 'g10', src: '/photos/g10.jpg', era: '가족 사진 촬영', caption: '분홍빛 스튜디오, 꽃을 든 온 가족' },
+  { id: 'g11', src: '/photos/g11.jpg', era: '가족 사진 촬영', caption: '턱시도와 웨딩드레스, 파란 배경 앞 온 가족' },
+  { id: 'g12', src: '/photos/g12.jpg', era: '가족 사진 촬영', caption: '웨딩드레스를 입은 어머님과 딸' },
+  { id: 'g13', src: '/photos/g13.jpg', era: '가족 사진 촬영', caption: '흑백으로 남긴 아버님의 환한 미소' },
+  { id: 'g14', src: '/photos/g14.jpg', era: '가족 사진 촬영', caption: '서로의 얼굴을 어루만지는 어머님과 딸' },
+  { id: 'g15', src: '/photos/g15.jpg', era: '가족 사진 촬영', caption: '아버님 곁에 선 사위와 딸' },
+  { id: 'g16', src: '/photos/g16.jpg', era: '가족 사진 촬영', caption: '가족이 함께 서서, 가장 근사한 날' },
+  { id: 'g17', src: '/photos/g17.jpg', era: '가족 사진 촬영', caption: '빨간 장미 한 다발을 건네는 아버님' },
+  { id: 'g18', src: '/photos/g18.jpg', era: '가족 사진 촬영', caption: '부케를 든 어머님, 오늘의 신부' },
+  { id: 'g19', src: '/photos/g19.jpg', era: '가족 사진 촬영', caption: '어머님의 손에 입 맞추는 아버님' },
+  { id: 'g20', src: '/photos/g20.jpg', era: '가족 사진 촬영', caption: '손을 맞잡고, 다시 신랑 신부' },
 ];
 
 export const photoById = (id) => PHOTOS.find((p) => p.id === id);
+
+// 가족 갤러리: 슬라이드로 넘겨 보는 순서. 사진 사이사이에 영상을 끼워 넣었어요.
+// { photo: 사진 id } 또는 { video: { id, vertical }, caption }
+export const GALLERY = [
+  { photo: 'g01' },
+  { photo: 'g02' },
+  { photo: 'g10' },
+  { video: VIDEO.birthday, caption: '생신 축하 영상' },
+  { photo: 'g08' },
+  { photo: 'g07' },
+  { photo: 'g05' },
+  { photo: 'g06' },
+  { video: VIDEO.items[0], caption: '우리 가족의 시간' },
+  { photo: 'g09' },
+  { photo: 'g03' },
+  { photo: 'g04' },
+  { photo: 'g13' },
+  { video: VIDEO.items[1], caption: '우리 가족의 시간' },
+  { photo: 'g16' },
+  { photo: 'g11' },
+  { photo: 'g12' },
+  { photo: 'g14' },
+  { photo: 'g15' },
+  { photo: 'g17' },
+  { photo: 'g18' },
+  { photo: 'g19' },
+  { photo: 'g20' },
+];
 
 // 인생 연표. 출생 연도·고향·직업 등을 알려 주시면 맨 앞에 항목을 더 넣을 수 있어요.
 // photos에는 PHOTOS의 id를 적습니다.
@@ -187,28 +237,6 @@ export function moodOf(letter) {
   });
   return best;
 }
-
-// 감사 100가지 쓰기 예시
-export const GRATITUDE_STARTERS = [
-  '늘 가족을 먼저 생각해 주셔서 감사해요.',
-  '힘든 내색 없이 묵묵히 일해 주셔서 감사해요.',
-  '언제나 믿어 주고 응원해 주셔서 감사해요.',
-  '건강하게 곁에 계셔 주셔서 감사해요.',
-  '평생 맛있는 밥상으로 우리를 먹여 살려 주셔서 감사해요.',
-  '직접 잡은 문어로 숙회 차려 주셔서 감사해요.',
-];
-
-// 아버님께 드릴 질문 예시
-export const VOICE_SUGGESTIONS = [
-  '비금도에서 보낸 어린 시절은 어땠어요?',
-  '요리사 일을 시작하게 된 계기가 뭐예요?',
-  '낚시는 언제부터 좋아하셨어요? 지금까지 잡은 가장 큰 고기는요?',
-  '3년 연애 끝에 결혼을 결심한 순간이 기억나세요?',
-  '첫아이를 안았을 때 기분이 어떠셨어요?',
-  '살면서 가장 힘들었던 때는 언제였고, 어떻게 이겨내셨어요?',
-  '자녀들에게 꼭 해 주고 싶은 말이 있으세요?',
-  '"인생은 아름다워"라고 느끼는 순간은 언제인가요?',
-];
 
 // 편지 카드 색
 export const LETTER_STYLES = [

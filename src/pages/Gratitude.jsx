@@ -1,73 +1,76 @@
 import { useEffect, useState } from 'react';
-import { GRATITUDE_GOAL } from '../config.js';
-import { GRATITUDE_STARTERS } from '../data/content.js';
 import { listGratitude, addGratitude } from '../services/store.js';
 import { SubHeader, Toast } from '../components/Common.jsx';
+import { PostIt } from '../components/PostIt.jsx';
 
 export default function Gratitude() {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(null); // null = 불러오는 중
   const [name, setName] = useState('');
   const [text, setText] = useState('');
   const [error, setError] = useState('');
   const [toast, setToast] = useState('');
+  const [fresh, setFresh] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  const reload = () => listGratitude().then(setItems);
-  useEffect(() => { reload(); }, []);
+  useEffect(() => { listGratitude().then(setItems); }, []);
 
-  const count = items.length;
-  const pct = Math.min(100, Math.round((count / GRATITUDE_GOAL) * 100));
+  const loaded = items !== null;
+  const count = loaded ? items.length : 0;
 
   const submit = async (e) => {
     e.preventDefault();
-    if (!name.trim() || !text.trim()) return setError('이름과 감사한 마음을 적어 주세요.');
+    if (!name.trim() || !text.trim()) return setError('이름과 전하고 싶은 마음을 적어 주세요.');
+    setBusy(true);
     try {
       await addGratitude({ name: name.trim(), text: text.trim() });
+      const before = new Set((items || []).map((g) => g.id));
+      const list = await listGratitude();
+      setItems(list);
+      setFresh(list.find((g) => !before.has(g.id))?.id || '');
       setText('');
       setError('');
-      await reload();
-      setToast(count + 1 >= GRATITUDE_GOAL ? '100가지를 모두 채웠어요! 🎉' : `${count + 1}번째 감사가 쌓였어요.`);
+      setToast('마음을 붙였어요. 고맙습니다 💛');
     } catch {
       setError('저장에 실패했어요. 잠시 뒤 다시 해 주세요.');
+    } finally {
+      setBusy(false);
     }
   };
 
   return (
-    <div className="page">
-      <SubHeader title="감사 100가지" subtitle="가족이 한 줄씩 보태서 아버님께 고마운 이유 100가지를 채워요" />
+    <div className="page wide-page">
+      <SubHeader title="감사의 마음 전하기" subtitle="그동안 쑥스러워 표현하지 못했던 감사의 마음을, 포스트잇에 적어 붙여 주세요" />
 
-      <div className="card progress-card">
-        <p className="count"><strong>{count}</strong> / {GRATITUDE_GOAL}</p>
-        <div className="bar-track"><div className="bar-fill" style={{ width: `${pct}%` }} /></div>
-        <p className="muted small">{count >= GRATITUDE_GOAL ? '100가지를 모두 채웠어요 🎉' : `${GRATITUDE_GOAL - count}가지가 더 필요해요`}</p>
+      <div className="thanks-total">
+        <p className="eyebrow">THANK YOU EVENT</p>
+        <p className="thanks-count">{loaded && <><strong>{count}</strong>장의 감사가 붙었어요</>}</p>
       </div>
 
-      <form className="card form" onSubmit={submit} style={{ marginTop: 16 }}>
-        <label>이름
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="예) 딸 OO" maxLength={20} />
-        </label>
-        <div>
-          <p className="label">예시 (누르면 입력돼요)</p>
-          <div className="chips">
-            {GRATITUDE_STARTERS.map((s) => (
-              <button type="button" key={s} className="chip" onClick={() => setText(s)}>{s.slice(0, 14)}…</button>
-            ))}
-          </div>
+      <form className="postit postit-form" onSubmit={submit}>
+        <label className="sr-only" htmlFor="th-text">전하고 싶은 감사</label>
+        <textarea
+          id="th-text"
+          rows={4}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          maxLength={120}
+          placeholder="아버님께, 그동안 말로 다 못 한 마음을 적어 주세요"
+        />
+        <div className="postit-from">
+          <label htmlFor="th-name">From.</label>
+          <input id="th-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" maxLength={20} />
         </div>
-        <label>아버님, 이래서 감사해요
-          <textarea rows={3} value={text} onChange={(e) => setText(e.target.value)} maxLength={120} />
-        </label>
         {error && <p className="error">{error}</p>}
-        <button className="btn btn-primary wide">감사 한 줄 보태기</button>
+        <button className="btn btn-primary wide" disabled={busy}>{busy ? '붙이는 중…' : '📌 포스트잇 붙이기'}</button>
       </form>
 
-      <ol className="gr-list" reversed>
-        {[...items].reverse().map((g, i) => (
-          <li key={g.id} value={count - i}>
-            <span className="gr-no">{count - i}</span>
-            <div><p>{g.text}</p><span className="muted small">— {g.name}</span></div>
-          </li>
-        ))}
-      </ol>
+      {!loaded ? null : count === 0 ? (
+        <p className="muted center" style={{ marginTop: 32 }}>아직 붙은 감사가 없어요. 첫 번째 마음을 붙여 주세요.</p>
+      ) : (
+        <div className="postit-wall">
+          {[...items].reverse().map((g) => <PostIt key={g.id} g={g} fresh={g.id === fresh} />)}
+        </div>
+      )}
       <Toast message={toast} onDone={() => setToast('')} />
     </div>
   );

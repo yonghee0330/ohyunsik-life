@@ -421,3 +421,72 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.35; mar
 .show.ls-light .show-btns button { background: rgba(0,0,0,.08); color: #3a3027; }
 .light-ghost { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(255,255,255,.3); }
 @media (max-width: 720px) { .ls-stage { padding-top: 64px; } }
+
+/* ---------- v3: 감사 전하기(포스트잇) · 가족 갤러리 ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.thanks-total { text-align: center; margin: 4px 0 22px; }
+.thanks-count { margin: 0 0 18px; font-family: var(--serif); font-size: 22px; }
+.thanks-count strong { font-size: 44px; color: var(--accent); margin-right: 4px; }
+
+.postit {
+  --c: #fff3a8; --r: 0deg;
+  position: relative; margin: 0; padding: 28px 20px 18px;
+  background: var(--c); color: #3a3126;
+  border-radius: 4px 4px 14px 4px;
+  box-shadow: 0 8px 18px rgba(70, 50, 30, 0.16), inset 0 -18px 24px -18px rgba(0, 0, 0, 0.08);
+  transform: rotate(var(--r));
+  font-family: var(--serif);
+}
+.postit::before {
+  content: ''; position: absolute; top: -9px; left: 50%; width: 64px; height: 20px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: rgba(255, 255, 255, 0.55); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.postit p { margin: 0 0 12px; font-size: 18px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.postit figcaption { text-align: right; font-size: 14px; color: rgba(58, 49, 38, 0.7); }
+.postit.fresh { animation: stick .6s cubic-bezier(.2, 1.4, .4, 1); }
+@keyframes stick {
+  from { transform: translateY(-40px) rotate(8deg) scale(1.15); opacity: 0; }
+  to { transform: rotate(var(--r)); opacity: 1; }
+}
+
+.postit-form { max-width: 460px; margin: 0 auto 44px; --r: -1deg; }
+.postit-form textarea { background: transparent; border: 0; padding: 0; font-family: var(--serif); font-size: 18px; line-height: 1.65; resize: none; outline: none; }
+.postit-form textarea::placeholder { color: rgba(58, 49, 38, 0.45); }
+.postit-from { display: flex; align-items: center; gap: 8px; margin: 8px 0 14px; padding-top: 10px; border-top: 1px dashed rgba(0, 0, 0, 0.18); }
+.postit-from label { font-size: 15px; color: rgba(58, 49, 38, 0.75); }
+.postit-from input { background: rgba(255, 255, 255, 0.55); border-radius: 10px; padding: 8px 10px; }
+.postit-form .btn { margin-top: 4px; }
+
+.postit-wall { max-width: 1100px; margin: 0 auto; padding: 14px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 32px 22px; }
+.postit-wall.peek { grid-template-columns: repeat(auto-fit, minmax(220px, 280px)); justify-content: center; margin-bottom: 20px; }
+
+.gal-stage { position: relative; height: min(74vh, 720px); min-height: 340px; background: #1d1814; border-radius: var(--radius); overflow: hidden; display: grid; grid-template: 100% / 100%; place-items: center; box-shadow: var(--shadow); touch-action: pan-y; }
+.gal-bg { position: absolute; inset: -30px; background-size: cover; background-position: center; filter: blur(28px) brightness(0.55); }
+.gal-img { position: relative; max-width: 100%; max-height: 100%; min-height: 0; object-fit: contain; animation: galfade .4s; }
+@keyframes galfade { from { opacity: 0; } to { opacity: 1; } }
+.gal-video { position: relative; width: 100%; height: 100%; padding: 14px; display: grid; place-items: center; }
+.gal-video .video-frame { width: min(100%, 880px); }
+.gal-video.vertical .video-frame { height: 100%; width: auto; max-width: 100%; aspect-ratio: 9 / 16; justify-self: center; }
+.gal-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(0, 0, 0, 0.35); color: #fff; font-size: 28px; line-height: 1; display: grid; place-items: center; padding: 0 0 4px; }
+.gal-nav.prev { left: 10px; }
+.gal-nav.next { right: 10px; }
+.gal-cap { text-align: center; font-family: var(--serif); font-size: 18px; margin: 16px 0 8px; min-height: 1.7em; }
+.gal-tag { background: var(--accent); color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 999px; margin-right: 8px; font-family: var(--sans); vertical-align: 2px; }
+.gal-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.gal-count { color: var(--muted); font-size: 15px; }
+.gal-bar .btn.on { background: var(--soft); }
+.gal-thumbs { display: flex; gap: 8px; overflow-x: auto; padding: 12px 2px 8px; scrollbar-width: thin; }
+.gal-thumbs button { flex: none; width: 64px; height: 64px; padding: 0; border-radius: 10px; border: 3px solid transparent; overflow: hidden; opacity: 0.65; background: #2a241e; }
+.gal-thumbs button.on { border-color: var(--accent); opacity: 1; }
+.gal-thumbs img { width: 100%; height: 100%; object-fit: cover; }
+.gal-thumb-video { display: grid; place-items: center; width: 100%; height: 100%; color: #fff; background: #3a312a; }
+
+.gal-peek { max-width: 1100px; margin: 0 auto 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.gal-peek button { border: 0; padding: 0; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+.gal-peek img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+@media (max-width: 720px) {
+  .gal-peek { grid-template-columns: repeat(2, 1fr); }
+  .gal-stage { height: min(68vh, 560px); }
+}

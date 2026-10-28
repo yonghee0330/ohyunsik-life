@@ -3,7 +3,7 @@ import { SITE, VIDEO } from '../config.js';
 import { TIMELINE, photoById } from '../data/content.js';
 import { go } from '../router.js';
 import { prepareBgm, playBgm, stopBgm, resumeBgm } from '../services/bgm.js';
-import { Player } from './Video.jsx';
+import { Player } from '../components/Player.jsx';
 
 // 전체 길이가 약 1분이 되도록 맞춘 시간(밀리초)
 const OPENING_MS = 2800; // 여는 화면

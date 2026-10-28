@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
-import { SITE, VIDEO, GRATITUDE_GOAL } from '../config.js';
-import { TIMELINE, LETTER_STYLES, photoById, paperOf } from '../data/content.js';
-import { listLetters, listGratitude, listVoices } from '../services/store.js';
+import { SITE, VIDEO } from '../config.js';
+import { LETTER_STYLES, GALLERY, photoById, paperOf } from '../data/content.js';
+import { listLetters, listGratitude } from '../services/store.js';
 import { go } from '../router.js';
 import { formatDate } from '../components/Common.jsx';
-import { Player } from './Video.jsx';
+import { Player } from '../components/Player.jsx';
+import { PostIt } from '../components/PostIt.jsx';
 
 const NAV = [
-  { id: 'timeline', label: '인생 연표' },
   { id: 'letters', label: '편지' },
-  { id: 'voice', label: '목소리' },
-  { id: 'gratitude', label: '감사 100가지' },
-  { id: 'video', label: '영상관' },
+  { id: 'gratitude', label: '감사 전하기' },
+  { id: 'gallery', label: '가족 갤러리' },
   { id: 'places', label: '걸어온 곳' },
 ];
 
@@ -31,17 +30,14 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [letters, setLetters] = useState([]);
   const [gratitude, setGratitude] = useState([]);
-  const [voices, setVoices] = useState([]);
 
   useEffect(() => {
     listLetters().then(setLetters);
     listGratitude().then(setGratitude);
-    listVoices().then(setVoices);
   }, []);
 
-  const answered = voices.filter((v) => v.answeredAt);
-  const latestVoice = answered[0];
-  const pct = Math.min(100, Math.round((gratitude.length / GRATITUDE_GOAL) * 100));
+  // 갤러리 맛보기: 슬라이드 앞쪽 사진 4장
+  const galleryPeek = GALLERY.filter((g) => g.photo).slice(0, 4).map((g) => photoById(g.photo));
 
   return (
     <>
@@ -73,7 +69,7 @@ export default function Home() {
             <p className="profile">{SITE.profile}</p>
             <div className="row" style={{ marginTop: 0 }}>
               {VIDEO.birthday && <button className="btn btn-primary" onClick={() => scrollToId('birthday')}>▶ 생신 축하 영상 보기</button>}
-              <button className={VIDEO.birthday ? 'btn btn-ghost' : 'btn btn-primary'} onClick={() => go('timeline')}>인생 연표 보기</button>
+              <button className={VIDEO.birthday ? 'btn btn-ghost' : 'btn btn-primary'} onClick={() => go('gallery')}>가족 갤러리 보기</button>
             </div>
           </div>
           <figure className="hero-photo">
@@ -91,30 +87,15 @@ export default function Home() {
                 <p className="eyebrow">HAPPY BIRTHDAY</p>
                 <h2>{SITE.honorific}, 생신 축하드립니다</h2>
                 <p>가족들이 마음을 모아 준비한 영상이에요.<br />재생 버튼을 눌러 함께 보세요.</p>
-                <p className="muted">영상을 보시고 떠오른 마음이 있다면, 편지 한 통이나 감사 한 줄로 보태 주세요.</p>
+                <p className="muted">영상을 보시고 떠오른 마음이 있다면, 편지 한 통이나 포스트잇 한 장으로 보태 주세요.</p>
                 <div className="row">
                   <button className="btn btn-primary" onClick={() => go('write-letter')}>축하 편지 쓰기</button>
-                  <button className="btn btn-ghost" onClick={() => go('gratitude')}>감사 한 줄 보태기</button>
+                  <button className="btn btn-ghost" onClick={() => go('gratitude')}>감사의 마음 전하기</button>
                 </div>
               </div>
             </div>
           </section>
         )}
-
-        {/* 인생 연표 */}
-        <section id="timeline" className="section section-alt">
-          <Head eyebrow="LIFE TIMELINE" title="인생 연표" desc="청년의 꿈에서 오늘의 감사까지, 시간 순서대로 따라가 보세요" />
-          <div className="tl-strip">
-            {TIMELINE.map((t, i) => (
-              <button key={i} className="tl-chip" onClick={() => go('timeline')}>
-                {t.photos[0] ? <img src={photoById(t.photos[0]).src} alt={t.title} loading="lazy" /> : <span className="tl-noimg">{t.when}</span>}
-                <span className="tl-chip-when">{t.when}</span>
-                <strong>{t.title}</strong>
-              </button>
-            ))}
-          </div>
-          <div className="row center"><button className="btn btn-primary" onClick={() => go('timeline')}>연표 전체 보기</button></div>
-        </section>
 
         {/* 편지 */}
         <section id="letters" className="section">
@@ -143,45 +124,38 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 목소리 */}
-        <section id="voice" className="section section-alt">
-          <Head eyebrow="VOICE" title={`${SITE.honorific}의 목소리`} desc="궁금했던 것을 물어보면, 아버님이 목소리로 들려주세요" />
-          <div className="card voice-teaser">
-            {latestVoice ? (
-              <>
-                <p className="q">Q. {latestVoice.question}</p>
-                {latestVoice.audio ? <audio controls preload="none" src={latestVoice.audio} /> : <p className="voice-text">{latestVoice.text}</p>}
-              </>
-            ) : (
-              <p className="muted center">아직 녹음된 이야기가 없어요. 질문을 남겨 두면 아버님이 시간 날 때 들려주실 거예요.</p>
-            )}
+        {/* 감사 전하기 */}
+        <section id="gratitude" className="section section-alt">
+          <Head eyebrow="THANK YOU EVENT" title="감사의 마음 전하기" desc="그동안 표현하지 못했던 고마운 마음을, 포스트잇 한 장에 적어 붙여 주세요" />
+          <p className="thanks-count center"><strong>{gratitude.length}</strong>장의 감사가 붙었어요</p>
+          {gratitude.length > 0 && (
+            <div className="postit-wall peek">
+              {[...gratitude].reverse().slice(0, 3).map((g) => <PostIt key={g.id} g={g} />)}
+            </div>
+          )}
+          <div className="row center">
+            <button className="btn btn-primary" onClick={() => go('gratitude')}>{gratitude.length ? '전체 보고 마음 붙이기' : '첫 마음 붙이기'}</button>
           </div>
-          <div className="row center"><button className="btn btn-primary" onClick={() => go('voice')}>질문 남기기 · 이야기 듣기{answered.length ? ` (${answered.length})` : ''}</button></div>
         </section>
 
-        {/* 감사 100가지 */}
-        <section id="gratitude" className="section">
-          <Head eyebrow="100 THANKS" title="감사 100가지" desc="가족이 한 줄씩 보태서, 고마운 이유 100가지를 채워 가요" />
-          <div className="card progress-card" style={{ maxWidth: 560, margin: '0 auto' }}>
-            <p className="count"><strong>{gratitude.length}</strong> / {GRATITUDE_GOAL}</p>
-            <div className="bar-track"><div className="bar-fill" style={{ width: `${pct}%` }} /></div>
-            {gratitude.length > 0 && (
-              <p className="muted small" style={{ marginTop: 10 }}>최근: “{gratitude[gratitude.length - 1].text}” — {gratitude[gratitude.length - 1].name}</p>
-            )}
+        {/* 가족 갤러리 */}
+        <section id="gallery" className="section">
+          <Head eyebrow="FAMILY GALLERY" title="가족 갤러리" desc="사진과 영상을 슬라이드로 넘겨 보세요. 사이사이에 가족의 영상도 들어 있어요" />
+          <div className="gal-peek">
+            {galleryPeek.map((p) => (
+              <button key={p.id} onClick={() => go('gallery')} aria-label="가족 갤러리 열기">
+                <img src={p.src} alt={p.caption} loading="lazy" />
+              </button>
+            ))}
           </div>
-          <div className="row center"><button className="btn btn-primary" onClick={() => go('gratitude')}>감사 한 줄 보태기</button></div>
-        </section>
-
-        {/* 영상관 */}
-        <section id="video" className="section section-alt">
-          <Head eyebrow="FAMILY FILM" title="가족 영상관" desc={VIDEO.desc} />
-          <div className="row center" style={{ marginTop: 0 }}>
-            <button className="btn btn-primary" onClick={() => go('video')}>영상 보러 가기</button>
+          <div className="row center">
+            <button className="btn btn-primary" onClick={() => go('gallery')}>슬라이드로 보기</button>
+            <button className="btn btn-ghost" onClick={() => go('album')}>📸 사진첩</button>
           </div>
         </section>
 
         {/* 걸어온 곳 */}
-        <section id="places" className="section">
+        <section id="places" className="section section-alt">
           <Head eyebrow="PLACES" title="함께 걸어온 곳" desc="제주, 남산, 바닷가…… 지도 위에 사진을 꽂아 두었어요" />
           <div className="row center" style={{ marginTop: 0 }}>
             <button className="btn btn-primary" onClick={() => go('places')}>지도 보러 가기</button>
