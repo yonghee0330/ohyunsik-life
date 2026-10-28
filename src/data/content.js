@@ -161,6 +161,33 @@ export const LETTER_PAPERS = [
 
 export const paperOf = (id) => LETTER_PAPERS.find((p) => p.id === id) || LETTER_PAPERS[0];
 
+// 편지를 읽을 때 흐르는 음악. 편지 글에 자주 나오는 말로 분위기를 골라요.
+// 곡은 services/bgm.js의 SONGS에 같은 이름으로 있어요.
+export const LETTER_MOODS = {
+  bright: { name: '축하하는 밝은 곡', words: ['생신', '생일', '축하', '행복', '건강하', '오래오래', '즐거', '웃', '신나', '재밌', '화이팅', '파이팅', 'ㅎㅎ', 'ㅋㅋ', '^^'] },
+  grateful: { name: '감사의 따뜻한 곡', words: ['감사', '고맙', '고마워', '고마운', '덕분', '존경', '은혜', '든든', '믿어', '본받', '배웠', '따뜻'] },
+  tender: { name: '그리움이 담긴 곡', words: ['죄송', '미안', '보고 싶', '보고싶', '그립', '그리워', '눈물', '울컥', '뭉클', '고생', '힘드셨', '힘들', '아프', '걱정', '후회', '철없', '못했', '몰랐'] },
+  calm: { name: '편안한 곡', words: [] },
+};
+
+const countOf = (text, word) => text.split(word).length - 1;
+
+// 가장 많이 나온 분위기를 고르고, 뚜렷하지 않으면 편안한 곡으로 해요.
+export function moodOf(letter) {
+  const text = `${letter.title || ''} ${letter.body || ''}`;
+  let best = 'calm';
+  let top = 1.5;
+  ['tender', 'grateful', 'bright'].forEach((id) => {
+    let score = LETTER_MOODS[id].words.reduce((n, w) => n + countOf(text, w), 0);
+    if (id === 'bright') score += countOf(text, '!') * 0.5;
+    if (score > top) {
+      best = id;
+      top = score;
+    }
+  });
+  return best;
+}
+
 // 감사 100가지 쓰기 예시
 export const GRATITUDE_STARTERS = [
   '늘 가족을 먼저 생각해 주셔서 감사해요.',

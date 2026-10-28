@@ -405,6 +405,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.35; mar
 .ls-head h2 { margin: 6px 0 10px; font-size: clamp(30px, 5.5vw, 52px); }
 .ls-small { margin: 0; font-size: 14px; letter-spacing: .12em; }
 .ls-title { margin: 0; font-family: var(--serif); font-size: clamp(18px, 2.6vw, 24px); opacity: .9; }
+.ls-mood { margin-top: 22px; font-size: 13px; letter-spacing: .06em; opacity: .85; }
 .ls-signline { margin: 0 0 8px; font-family: var(--serif); font-size: clamp(24px, 4vw, 38px); }
 .ls-fade { animation: ls-life var(--ms) ease both; }
 @keyframes ls-life {

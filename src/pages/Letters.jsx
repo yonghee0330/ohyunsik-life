@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LETTER_STYLES, paperOf } from '../data/content.js';
+import { LETTER_STYLES, paperOf, moodOf } from '../data/content.js';
 import { listLetters } from '../services/store.js';
 import { prepareBgm } from '../services/bgm.js';
 import { go } from '../router.js';
@@ -11,8 +11,11 @@ export default function Letters() {
   const [show, setShow] = useState(null); // 읽을 편지 목록
 
   useEffect(() => {
-    listLetters().then(setLetters);
-    prepareBgm(); // 읽기 화면의 음악을 미리 만들어 둡니다.
+    // 읽기 화면의 음악을 편지 분위기별로 미리 만들어 둡니다.
+    listLetters().then((list) => {
+      setLetters(list);
+      [...new Set(list.map(moodOf))].forEach((m) => prepareBgm(m));
+    });
   }, []);
 
   // 이어 읽기는 먼저 도착한 편지부터 차례로

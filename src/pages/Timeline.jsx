@@ -61,8 +61,8 @@ export default function Timeline() {
 
   // 처음 열리면 음악부터 켜 봅니다.
   useEffect(() => {
-    prepareBgm(); // 곡을 미리 만들어 두면, 누르는 순간 바로 재생돼요.
-    playBgm().then((ok) => setNeedTap(!ok));
+    prepareBgm('timeline'); // 곡을 미리 만들어 두면, 누르는 순간 바로 재생돼요.
+    playBgm('timeline').then((ok) => setNeedTap(!ok));
     return () => stopBgm();
   }, []);
 
@@ -115,7 +115,7 @@ export default function Timeline() {
       stopBgm();
       setNeedTap(false);
     } else {
-      playBgm().then((ok) => setNeedTap(!ok));
+      playBgm('timeline').then((ok) => setNeedTap(!ok));
     }
     setMusic(!music);
   };
@@ -134,7 +134,7 @@ export default function Timeline() {
     setIdx(0);
     setPlaying(true);
     setMusic(true);
-    playBgm().then((ok) => setNeedTap(!ok));
+    playBgm('timeline').then((ok) => setNeedTap(!ok));
   };
 
   const progress = ((idx + 1) / slides.length) * 100;

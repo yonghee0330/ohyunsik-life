@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { paperOf } from '../data/content.js';
+import { paperOf, moodOf, LETTER_MOODS } from '../data/content.js';
 import { formatDate } from '../components/Common.jsx';
 import { prepareBgm, playBgm, stopBgm, resumeBgm } from '../services/bgm.js';
 
@@ -43,6 +43,7 @@ export default function LetterShow({ letters, onClose, onPlayAll }) {
 
   const step = steps[idx];
   const paper = paperOf(step.l.paper);
+  const mood = moodOf(step.l);
   const waitingStart = needTap && music && idx === 0 && !done;
 
   const next = useCallback(() => {
@@ -56,11 +57,20 @@ export default function LetterShow({ letters, onClose, onPlayAll }) {
   }, [steps.length]);
   const prev = () => setIdx((i) => Math.max(0, i - 1));
 
+  // 편지마다 분위기에 맞는 곡을 미리 만들어 둡니다.
   useEffect(() => {
-    prepareBgm();
-    playBgm().then((ok) => setNeedTap(!ok));
-    return () => stopBgm();
-  }, []);
+    [...new Set(letters.map(moodOf))].forEach((m) => prepareBgm(m));
+  }, [letters]);
+
+  useEffect(() => () => stopBgm(), []);
+
+  // 편지가 바뀌면 그 편지의 곡으로 바꿔 틉니다(처음 편지 포함).
+  const musicRef = useRef(music);
+  musicRef.current = music;
+  useEffect(() => {
+    if (!musicRef.current) return;
+    playBgm(mood).then((ok) => setNeedTap(!ok));
+  }, [mood]);
 
   // 소리가 막혔으면 화면을 누를 때 켭니다(click/touchend만 휴대폰에서 허용).
   useEffect(() => {
@@ -99,7 +109,7 @@ export default function LetterShow({ letters, onClose, onPlayAll }) {
       stopBgm();
       setNeedTap(false);
     } else {
-      playBgm().then((ok) => setNeedTap(!ok));
+      playBgm(mood).then((ok) => setNeedTap(!ok));
     }
     setMusic(!music);
   };
@@ -134,6 +144,7 @@ export default function LetterShow({ letters, onClose, onPlayAll }) {
               <p className="ls-small" style={{ color: paper.sub }}>아버님께 드리는 편지</p>
               <h2>From. {l.from}</h2>
               {l.title && <p className="ls-title">{l.title}</p>}
+              {music && <p className="ls-small ls-mood" style={{ color: paper.sub }}>♪ {LETTER_MOODS[mood].name}</p>}
             </div>
           )}
           {step.kind === 'line' && (
