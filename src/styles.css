@@ -298,3 +298,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.35; mar
 .profile { margin: -10px 0 22px; font-size: 14px; color: var(--accent-2); font-weight: 500; }
 .tl-noimg { display: grid; place-items: center; aspect-ratio: 4 / 3; width: 100%; margin-bottom: 8px; background: linear-gradient(135deg, var(--soft), var(--bg-alt)); color: var(--accent-2); font-family: var(--serif); font-size: 20px; }
 .place-noimg { flex: none; width: 72px; height: 72px; border-radius: 12px; display: grid; place-items: center; background: var(--soft); font-size: 30px; }
+
+.video-list { display: grid; gap: 20px; }
+.shorts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 320px)); justify-content: center; gap: 20px; margin-top: 24px; }
+.video-frame.vertical { aspect-ratio: 9 / 16; }

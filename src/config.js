@@ -11,12 +11,16 @@ export const SITE = {
   heroCaption: '반듯했던 청년 오현식, 그리고 지금까지의 모든 날',
 };
 
-// 가족 영상관. 영상이 약 470MB라 사이트에는 올리지 않고 YouTube '일부 공개'로 올린 뒤
-// 주소 끝의 영상 ID만 넣습니다. (예: https://youtu.be/AbCdEfGhIjK → 'AbCdEfGhIjK')
+// 가족 영상관. 영상 파일은 크기가 커서 YouTube에 올리고 영상 ID만 넣습니다.
+// 일반 영상은 vertical: false, 쇼츠(세로 영상)는 vertical: true
 export const VIDEO = {
-  youtubeId: '',
   title: '우리 가족의 시간',
   desc: '사진으로는 다 담지 못한 웃음소리와 목소리가 담긴 영상입니다.',
+  items: [
+    { id: 't34aEjJb8uE', vertical: false },
+    { id: 'MaisnxbzEZw', vertical: true },
+    { id: 'BrHw3aj7dss', vertical: true },
+  ],
 };
 
 // 감사 100가지 목표 개수
