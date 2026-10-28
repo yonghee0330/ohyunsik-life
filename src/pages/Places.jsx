@@ -24,8 +24,10 @@ export default function Places() {
     }).addTo(map);
     const bounds = [];
     pinned.forEach((p) => {
-      const icon = L.divIcon({ className: 'pin', html: `<span>${p.photos.length}</span>`, iconSize: [34, 34], iconAnchor: [17, 34] });
-      L.marker([p.lat, p.lng], { icon, title: p.name }).addTo(map).on('click', () => open(p));
+      const icon = L.divIcon({ className: 'pin', html: `<span>${p.photos.length || '★'}</span>`, iconSize: [34, 34], iconAnchor: [17, 34] });
+      const m = L.marker([p.lat, p.lng], { icon, title: p.name }).addTo(map);
+      if (p.photos.length) m.on('click', () => open(p));
+      else m.bindPopup(`<strong>${p.name}</strong><br/>${p.note}`);
       bounds.push([p.lat, p.lng]);
     });
     map.fitBounds(bounds, { padding: [50, 50], maxZoom: 9 });
@@ -40,7 +42,7 @@ export default function Places() {
       <div className="place-list">
         {pinned.map((p) => (
           <button key={p.id} className="card place" onClick={() => open(p)}>
-            <img src={photoById(p.photos[0])?.src} alt={p.name} loading="lazy" />
+            {p.photos.length ? <img src={photoById(p.photos[0]).src} alt={p.name} loading="lazy" /> : <span className="place-noimg">🏝️</span>}
             <div><strong>📍 {p.name}</strong><p className="muted small">{p.note}</p></div>
           </button>
         ))}

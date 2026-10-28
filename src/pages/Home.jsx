@@ -69,6 +69,7 @@ export default function Home() {
               {SITE.name}의 <em>‘{SITE.title}’</em>
             </h1>
             <p className="lead">{SITE.heroSub}</p>
+            <p className="profile">{SITE.profile}</p>
             <div className="row" style={{ marginTop: 0 }}>
               <button className="btn btn-primary" onClick={() => go('timeline')}>인생 연표 보기</button>
               <button className="btn btn-ghost" onClick={() => go('write-letter')}>편지 쓰기</button>
@@ -86,7 +87,7 @@ export default function Home() {
           <div className="tl-strip">
             {TIMELINE.map((t, i) => (
               <button key={i} className="tl-chip" onClick={() => go('timeline')}>
-                <img src={photoById(t.photos[0])?.src} alt={t.title} loading="lazy" />
+                {t.photos[0] ? <img src={photoById(t.photos[0]).src} alt={t.title} loading="lazy" /> : <span className="tl-noimg">{t.when}</span>}
                 <span className="tl-chip-when">{t.when}</span>
                 <strong>{t.title}</strong>
               </button>

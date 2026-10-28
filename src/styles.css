@@ -294,3 +294,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.35; mar
   .nav-links button { text-align: left; }
   .map { height: 300px; }
 }
+
+.profile { margin: -10px 0 22px; font-size: 14px; color: var(--accent-2); font-weight: 500; }
+.tl-noimg { display: grid; place-items: center; aspect-ratio: 4 / 3; width: 100%; margin-bottom: 8px; background: linear-gradient(135deg, var(--soft), var(--bg-alt)); color: var(--accent-2); font-family: var(--serif); font-size: 20px; }
+.place-noimg { flex: none; width: 72px; height: 72px; border-radius: 12px; display: grid; place-items: center; background: var(--soft); font-size: 30px; }
