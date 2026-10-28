@@ -10,8 +10,10 @@ import Places from './pages/Places.jsx';
 import Album from './pages/Album.jsx';
 import { currentRoute } from './router.js';
 
+// 첫 화면('')은 인생 연표 슬라이드쇼, 메인 화면은 #/home
 const ROUTES = {
-  '': Home,
+  '': Timeline,
+  home: Home,
   timeline: Timeline,
   letters: Letters,
   'write-letter': LetterWrite,
@@ -35,5 +37,6 @@ export default function App() {
   }, []);
 
   const Page = ROUTES[route] || Home;
-  return <Page />;
+  // 같은 연표 화면이라도 주소가 바뀌면 처음부터 다시 시작하도록 key를 줍니다.
+  return <Page key={route} />;
 }

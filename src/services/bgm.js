@@ -157,23 +157,44 @@ function stopSynth() {
 // ---------- 공개 함수 ----------
 let playing = false;
 
-// 반드시 버튼 클릭 같은 사용자 동작 안에서 불러야 합니다(브라우저 자동재생 정책).
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// 음악을 켭니다. 소리가 실제로 나면 true, 브라우저가 막았으면 false를 돌려줍니다.
+// 막힌 경우에도 연주는 준비해 두므로, 화면을 한 번 누를 때 resumeBgm()을 부르면 바로 소리가 납니다.
 export async function playBgm() {
-  if (playing) return;
+  if (playing) return isBgmAudible();
   playing = true;
-  // 클릭 직후에 오디오를 깨워 둬야 아이폰 사파리에서도 소리가 납니다.
   ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
   ctx.resume();
   if (await hasMp3()) {
     audioEl = audioEl || Object.assign(new Audio(MP3_SRC), { loop: true, volume: 0.6 });
     try {
       await audioEl.play();
-      return;
+      return true;
     } catch {
-      /* 실패하면 직접 연주로 */
+      return false;
     }
   }
   startSynth();
+  await Promise.race([ctx.resume(), wait(400)]);
+  return isBgmAudible();
+}
+
+export function isBgmAudible() {
+  if (!playing) return false;
+  if (audioEl) return !audioEl.paused;
+  return ctx?.state === 'running';
+}
+
+// 사용자가 화면을 누른 순간에 부릅니다(자동재생이 막혔을 때).
+export async function resumeBgm() {
+  if (!playing) return false;
+  if (audioEl) {
+    try { await audioEl.play(); } catch { return false; }
+    return true;
+  }
+  await ctx?.resume();
+  return isBgmAudible();
 }
 
 export function stopBgm() {

@@ -35,7 +35,7 @@ export default function LetterWrite() {
           <h2>편지가 도착했어요</h2>
           <p className="muted">{SITE.honorific}께 마음이 전해질 거예요</p>
           <div className="row center">
-            <button className="btn btn-ghost" onClick={() => go('')}>← 홈으로</button>
+            <button className="btn btn-ghost" onClick={() => go('home')}>← 홈으로</button>
             <button className="btn btn-primary" onClick={() => go('letters')}>편지 모아보기</button>
           </div>
         </div>

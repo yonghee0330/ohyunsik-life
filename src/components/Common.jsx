@@ -5,7 +5,7 @@ import { checkFamilyPin, isFamily } from '../services/store.js';
 export function SubHeader({ title, subtitle }) {
   return (
     <div className="sub-head">
-      <button className="btn-back" onClick={() => go('')}>← 홈으로</button>
+      <button className="btn-back" onClick={() => go('home')}>← 홈으로</button>
       <h1 className="sub-title">{title}</h1>
       {subtitle && <p className="sub-desc">{subtitle}</p>}
     </div>

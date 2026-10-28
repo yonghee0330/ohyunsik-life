@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { SITE } from '../config.js';
+import { SITE, VIDEO } from '../config.js';
 import { TIMELINE, photoById } from '../data/content.js';
 import { go } from '../router.js';
-import { playBgm, stopBgm } from '../services/bgm.js';
+import { playBgm, stopBgm, resumeBgm } from '../services/bgm.js';
+import { Player } from './Video.jsx';
 
 const SLIDE_MS = 6500; // 사진 한 장이 머무는 시간
 const CHAPTER_MS = 10000; // 장면의 첫 사진(설명 글이 함께 나오는 사진)이 머무는 시간
-const TITLE_MS = 7000; // 사진 없는 장면(제목 카드)이 머무는 시간
+const TITLE_MS = 7000; // 사진 없는 장면(글자 화면)이 머무는 시간
 
-// 연표를 슬라이드 목록으로 펼칩니다. 장면마다 사진 수만큼 슬라이드가 생기고,
-// 사진이 없는 장면은 글자만 있는 제목 카드가 됩니다.
+// 연표를 슬라이드 목록으로 펼칩니다. 맨 앞에 여는 화면을 두고,
+// 장면마다 사진 수만큼 슬라이드를 만들며, 사진이 없는 장면은 글자 화면이 됩니다.
 function buildSlides() {
-  const slides = [];
+  const slides = [{ opening: true, photo: null }];
   TIMELINE.forEach((t, chapter) => {
     const photos = t.photos.map(photoById).filter(Boolean);
     if (!photos.length) {
@@ -25,35 +26,61 @@ function buildSlides() {
 
 const slideMs = (sl) => (!sl.photo ? TITLE_MS : sl.first ? CHAPTER_MS : SLIDE_MS);
 
+// 접속하면 바로 시작하는 인생 연표 슬라이드쇼. 마지막은 생신 축하 영상으로 이어집니다.
 export default function Timeline() {
   const slides = useMemo(buildSlides, []);
-  const [started, setStarted] = useState(false);
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [music, setMusic] = useState(true);
+  const [needTap, setNeedTap] = useState(false); // 브라우저가 소리를 막았을 때
   const [ended, setEnded] = useState(false);
   const timer = useRef(null);
 
   const s = slides[idx];
 
+  const finish = useCallback(() => {
+    setEnded(true);
+    stopBgm(); // 축하 영상 소리가 잘 들리도록 배경음악은 조용히 끕니다.
+    setMusic(false);
+    setNeedTap(false);
+  }, []);
+
   const next = useCallback(() => {
     setIdx((i) => {
       if (i + 1 >= slides.length) {
-        setEnded(true);
+        finish();
         return i;
       }
       return i + 1;
     });
-  }, [slides.length]);
-  const prev = () => { setEnded(false); setIdx((i) => Math.max(0, i - 1)); };
+  }, [slides.length, finish]);
+  const prev = () => setIdx((i) => Math.max(0, i - 1));
+
+  // 처음 열리면 음악부터 켜 봅니다.
+  useEffect(() => {
+    playBgm().then((ok) => setNeedTap(!ok));
+    return () => stopBgm();
+  }, []);
+
+  // 소리가 막혔으면, 화면 어디든 처음 누를 때 음악을 켭니다.
+  useEffect(() => {
+    if (!needTap) return;
+    const onFirst = () => resumeBgm().then((ok) => ok && setNeedTap(false));
+    window.addEventListener('pointerdown', onFirst);
+    window.addEventListener('keydown', onFirst);
+    return () => {
+      window.removeEventListener('pointerdown', onFirst);
+      window.removeEventListener('keydown', onFirst);
+    };
+  }, [needTap]);
 
   // 자동 넘김
   useEffect(() => {
     clearTimeout(timer.current);
-    if (!started || !playing || ended) return;
+    if (!playing || ended) return;
     timer.current = setTimeout(next, slideMs(s));
     return () => clearTimeout(timer.current);
-  }, [started, playing, ended, idx, next, s]);
+  }, [playing, ended, idx, next, s]);
 
   // 다음 사진 미리 불러오기
   useEffect(() => {
@@ -61,39 +88,54 @@ export default function Timeline() {
     if (n?.photo) new Image().src = n.photo.src;
   }, [idx, slides]);
 
-  // 페이지를 떠나면 음악 끄기
-  useEffect(() => () => stopBgm(), []);
-
   // 키보드: ← → 넘기기, 스페이스 일시정지
   useEffect(() => {
     const onKey = (e) => {
-      if (!started) return;
+      if (ended) return;
       if (e.key === 'ArrowRight') next();
       if (e.key === 'ArrowLeft') prev();
       if (e.key === ' ') { e.preventDefault(); setPlaying((p) => !p); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [started, next]);
+  }, [ended, next]);
 
-  const start = (withMusic) => {
-    setStarted(true);
-    setMusic(withMusic);
-    if (withMusic) playBgm();
-  };
-
-  const toggleMusic = () => {
-    if (music) stopBgm(); else playBgm();
+  const toggleMusic = (e) => {
+    e.stopPropagation();
+    if (music) {
+      stopBgm();
+      setNeedTap(false);
+    } else {
+      playBgm().then((ok) => setNeedTap(!ok));
+    }
     setMusic(!music);
   };
 
-  const restart = () => { setEnded(false); setIdx(0); setPlaying(true); };
+  const skip = () => { stopBgm(); go('home'); };
+
+  const replay = () => {
+    setEnded(false);
+    setIdx(0);
+    setPlaying(true);
+    setMusic(true);
+    playBgm().then((ok) => setNeedTap(!ok));
+  };
 
   const progress = ((idx + 1) / slides.length) * 100;
 
   return (
     <div className="show">
-      <button className="show-back" onClick={() => { stopBgm(); go(''); }}>← 홈으로</button>
+      {/* 오른쪽 위: 작은 음악 버튼, 연표 끄기 */}
+      {!ended && (
+        <div className="show-top">
+          <button className="show-icon" onClick={toggleMusic} aria-label={music ? '음악 끄기' : '음악 켜기'} title={music ? '음악 끄기' : '음악 켜기'}>
+            {music ? '♪' : <span className="muted-note">♪</span>}
+          </button>
+          <button className="show-skip" onClick={skip}>연표 끄기 ✕</button>
+        </div>
+      )}
+
+      {needTap && music && !ended && <div className="show-hint">화면을 한 번 눌러 주세요 ♪</div>}
 
       {/* 슬라이드 */}
       {slides.map((sl, i) => (
@@ -112,7 +154,15 @@ export default function Timeline() {
       ))}
 
       {/* 글자 */}
-      {started && (
+      {!ended && s.opening && (
+        <div className="show-opening" key="opening">
+          <p className="eyebrow light">{SITE.tagline}</p>
+          <h1>{SITE.name}</h1>
+          <p className="show-opening-sub">인생은 아름다워</p>
+          <p className="show-opening-line">1953년 비금도에서 오늘까지, 한 사람이 걸어온 길</p>
+        </div>
+      )}
+      {!ended && !s.opening && (
         // 사진이 잘 보이도록 글은 잠시 보였다가 사라집니다. 일시정지하면 계속 보여요.
         <div
           className={s.photo && playing ? 'show-text fades' : 'show-text'}
@@ -126,40 +176,32 @@ export default function Timeline() {
         </div>
       )}
 
-      {/* 조작 */}
-      {started && (
+      {/* 아래 조작 막대 */}
+      {!ended && (
         <div className="show-ctrl">
           <div className="show-bar"><div style={{ width: `${progress}%` }} /></div>
           <div className="show-btns">
             <button onClick={prev} aria-label="이전">‹</button>
             <button onClick={() => setPlaying((p) => !p)} aria-label={playing ? '일시정지' : '재생'}>{playing ? '❚❚' : '▶'}</button>
             <button onClick={next} aria-label="다음">›</button>
-            <button onClick={toggleMusic} className="show-music">{music ? '♪ 음악 끄기' : '♪ 음악 켜기'}</button>
           </div>
         </div>
       )}
 
-      {/* 시작 화면 */}
-      {!started && (
-        <div className="show-start">
-          <p className="eyebrow light">LIFE TIMELINE</p>
-          <h1>{SITE.name}의 인생 연표</h1>
-          <p>1953년 비금도에서 오늘까지,<br />천천히 함께 돌아봐요.</p>
-          <button className="btn btn-primary show-play" onClick={() => start(true)}>▶ 음악과 함께 보기</button>
-          <button className="link-btn light" onClick={() => start(false)}>음악 없이 보기</button>
-        </div>
-      )}
-
-      {/* 끝 화면 */}
+      {/* 마지막: 생신 축하 */}
       {ended && (
-        <div className="show-start">
-          <h1>인생은 아름다워</h1>
-          <p>{SITE.honorific}, 생신 축하드립니다.<br />지나온 모든 날에 감사합니다.</p>
+        <div className="show-finale">
+          <p className="eyebrow light">HAPPY BIRTHDAY</p>
+          <h1>{SITE.honorific}, 생신 축하드립니다</h1>
+          <p className="show-finale-line">지나온 모든 날에 감사합니다. 인생은 정말 아름답습니다.</p>
+          {VIDEO.birthday && (
+            <div className="show-finale-video"><Player {...VIDEO.birthday} title="생신 축하 영상" /></div>
+          )}
           <div className="row center">
-            <button className="btn btn-primary" onClick={() => { stopBgm(); go('write-letter'); }}>편지 쓰기</button>
-            <button className="btn btn-ghost" onClick={restart}>처음부터 다시 보기</button>
+            <button className="btn btn-primary" onClick={() => go('home')}>들어가기</button>
+            <button className="btn btn-ghost" onClick={() => go('write-letter')}>축하 편지 쓰기</button>
           </div>
-          <button className="link-btn light" onClick={() => { stopBgm(); go('album'); }}>사진 모두 보기 · 사진 올리기</button>
+          <button className="link-btn light" onClick={replay}>연표 처음부터 다시 보기</button>
         </div>
       )}
     </div>
