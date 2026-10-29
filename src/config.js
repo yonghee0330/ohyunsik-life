@@ -22,3 +22,10 @@ export const VIDEO = {
     { id: 'MaisnxbzEZw', vertical: true },
   ],
 };
+
+// 비밀 통로(이스터 에그): 푸터의 작은 하트를 누르면 이어지는 상대 페이지
+export const PARTNER = {
+  name: '유정임',
+  title: '오늘 더 행복해',
+  url: 'https://xn--2r5b6gop.kr', // 유정임.kr
+};

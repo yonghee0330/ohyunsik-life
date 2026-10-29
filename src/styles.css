@@ -517,3 +517,18 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.35; mar
 /* 음악이 꺼진 상태: 눈에 띄게 '음악 켜기' 글자를 함께 보여 줍니다 */
 .show-icon.off { width: auto; padding: 0 13px; border-radius: 999px; font-size: 13px; gap: 5px; display: inline-flex; align-items: center; }
 .show-icon.off .muted-note { opacity: .9; text-decoration: none; }
+
+/* ---------- 비밀 통로(이스터 에그) ---------- */
+.secret-heart { background: none; border: 0; padding: 2px 4px; margin-left: 2px; font-size: 14px; line-height: 1; color: var(--line); opacity: .7; transition: color .2s, transform .2s, opacity .2s; }
+.secret-heart:hover, .secret-heart:focus-visible { color: #e0566f; opacity: 1; transform: scale(1.35) rotate(-8deg); }
+.secret-box { text-align: center; padding: 8px 4px 2px; }
+.secret-box h3 { font-size: 22px; margin: 4px 0 12px; }
+.secret-box p { margin: 0 0 16px; line-height: 1.8; }
+.secret-emoji { font-size: 40px; margin-bottom: 4px !important; }
+.secret-go { position: fixed; inset: 0; z-index: 100; display: grid; place-content: center; text-align: center; gap: 6px; color: #fff; font-family: var(--serif); font-size: 22px; background: linear-gradient(160deg, #e98aa0 0%, #f4b6a0 55%, #f7d9a8 100%); animation: secretfade .5s ease both; }
+.secret-go p { margin: 0; }
+.secret-go-emoji { font-size: 64px; animation: secretdash 1.6s ease-in-out infinite; }
+.secret-hearts { margin-top: 10px; letter-spacing: .3em; animation: secretpulse 1s ease-in-out infinite; }
+@keyframes secretfade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes secretdash { 0%, 100% { transform: translateX(-14px); } 50% { transform: translateX(14px); } }
+@keyframes secretpulse { 0%, 100% { opacity: .5; transform: scale(.95); } 50% { opacity: 1; transform: scale(1.08); } }

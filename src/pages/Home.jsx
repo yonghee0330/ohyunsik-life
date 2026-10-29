@@ -6,6 +6,7 @@ import { go } from '../router.js';
 import { formatDate } from '../components/Common.jsx';
 import { Player } from '../components/Player.jsx';
 import { PostIt } from '../components/PostIt.jsx';
+import SecretDoor from '../components/SecretDoor.jsx';
 
 const NAV = [
   { id: 'letters', label: '편지' },
@@ -163,7 +164,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="footer">© {SITE.name} | {SITE.title}. All rights reserved.</footer>
+      <footer className="footer">© {SITE.name} | {SITE.title}. All rights reserved. <SecretDoor /></footer>
     </>
   );
 }
